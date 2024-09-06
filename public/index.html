@@ -3,47 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Catalog</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .container { width: 80%; margin: auto; }
-        .product { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
-        .product img { max-width: 200px; }
-    </style>
+    <title>Flowerly</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Plant Catalog</h1>
-        <div id="products"></div>
-    </div>
-
-    <script>
-        // Função para carregar e exibir os produtos
-        async function loadProducts() {
-            try {
-                const response = await fetch('/plants');
-                const products = await response.json();
-                const productsContainer = document.getElementById('products');
-                productsContainer.innerHTML = products.map(product => `
-                    <div class="product">
-                        <h2>${product.name}</h2>
-                        <img src="${product.image_url}" alt="${product.name}">
-                        <p><strong>Scientific Name:</strong> ${product.scientific_name}</p>
-                        <p><strong>Description:</strong> ${product.description}</p>
-                        <p><strong>Category:</strong> ${product.category}</p>
-                        <p><strong>Price:</strong> $${product.price.toFixed(2)}</p>
-                        <p><strong>Stock Quantity:</strong> ${product.stock_quantity}</p>
-                        <p><strong>Origin Location:</strong> ${product.origin_location}</p>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading products:', error);
-            }
-        }
-
-        // Carregar os produtos ao iniciar
-        document.addEventListener('DOMContentLoaded', loadProducts);
-    </script>
+    <h1>Welcome to the Plant Dashboard</h1>
+    <button onclick="window.location.href='view-all.html'">View All Plants</button>
+    <button onclick="window.location.href='search.html'">Search by Name</button>
 </body>
 </html>
 
