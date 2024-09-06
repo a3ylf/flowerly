@@ -68,6 +68,18 @@ CREATE TABLE cart_item (
     PRIMARY KEY (cart_id, product_id)
 );
 
+CREATE OR REPLACE FUNCTION update_stock(
+    p_id INTEGER,
+    p_stock_quantity INTEGER
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE plants
+    SET stock_quantity = p_stock_quantity
+    WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE ROLE boss WITH LOGIN SUPERUSER PASSWORD '123456';
 GRANT ALL PRIVILEGES ON DATABASE flowerly TO boss;
 

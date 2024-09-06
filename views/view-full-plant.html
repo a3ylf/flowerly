@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+</head>
+<body>
+    <h1>{{.Title}}</h1>
+    
+    <h2>{{.Plant.Name}}</h2>
+    <p><strong>Nome Científico:</strong> {{.Plant.ScientificName}}</p>
+    <p><strong>Descrição:</strong> {{.Plant.Description}}</p>
+    <p><strong>Categoria:</strong> {{.Plant.Category}}</p>
+    <p><strong>Preço:</strong> R$ {{.Plant.Price}}</p>
+    <p><strong>Quantidade em Estoque:</strong> {{.Plant.StockQuantity}}</p>
+    <p><strong>URL da Imagem:</strong> <img src="{{.Plant.ImageURL}}" alt="{{.Plant.Name}}" width="200"></p>
+    <p><strong>Local de Origem:</strong> {{.Plant.OriginLocation}}</p>
+    
+    <a href="/">Voltar para a Página Inicial</a>
+</body>
+</html>
+
