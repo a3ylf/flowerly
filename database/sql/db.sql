@@ -1,5 +1,3 @@
--- Cria um novo superusuário
-CREATE ROLE flowermaster WITH LOGIN SUPERUSER PASSWORD '123456';
 
 CREATE TABLE plants (
     id SERIAL PRIMARY KEY,
@@ -38,4 +36,38 @@ VALUES
 
 
 -- Concede permissões ao novo usuário
-GRANT ALL PRIVILEGES ON DATABASE plants TO flowermaster;
+
+CREATE TABLE client (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,      
+    address TEXT
+);
+
+CREATE TABLE vendor (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL   
+);
+
+
+
+CREATE TABLE cart (
+    id SERIAL PRIMARY KEY,
+    client_id INT REFERENCES client(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE cart_item (
+    cart_id INT REFERENCES cart(id) ON DELETE CASCADE,     
+    product_id INT REFERENCES plants(id) ON DELETE CASCADE,
+    quantity INT NOT NULL CHECK (quantity > 0),            
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (cart_id, product_id)
+);
+
+CREATE ROLE boss WITH LOGIN SUPERUSER PASSWORD '123456';
+GRANT ALL PRIVILEGES ON DATABASE flowerly TO boss;
+

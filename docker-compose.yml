@@ -14,9 +14,9 @@ services:
     image: postgres:alpine
     container_name: database_postgres
     environment:
-      - POSTGRES_USER=apns
+      - POSTGRES_USER=flowermaster
       - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=trivia  
+      - POSTGRES_DB=flowerly
     ports:
       - "5432:5432"
     volumes:
