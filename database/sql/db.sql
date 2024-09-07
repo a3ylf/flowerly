@@ -41,23 +41,36 @@ CREATE TABLE client (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,      
-    address TEXT
+    password VARCHAR(255) NOT NULL,
+    cpf varchar(15) not null,
+    rua TEXT not null,
+    num smallint not null
 );
 
 CREATE TABLE vendor (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL   
+    password VARCHAR(255) NOT NULL,   
+    cpf varchar(11) unique not null
 );
+
+CREATE TABLE purchase (
+    id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL,
+    cart_id INT NOT NULL,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    payment_status VARCHAR(50) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL
+);
+
 
 
 
 CREATE TABLE cart (
     id SERIAL PRIMARY KEY,
-    client_id INT REFERENCES client(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    client_id INT REFERENCES client(id) ON DELETE CASCADE
 );
 
 CREATE TABLE cart_item (
@@ -67,6 +80,12 @@ CREATE TABLE cart_item (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (cart_id, product_id)
 );
+
+ALTER TABLE purchase ADD CONSTRAINT fk_customer
+FOREIGN KEY (customer_id) REFERENCES client(id);
+
+ALTER TABLE purchase ADD CONSTRAINT fk_cart
+FOREIGN KEY (cart_id) REFERENCES cart(id);
 
 CREATE OR REPLACE FUNCTION update_stock(
     p_id INTEGER,
