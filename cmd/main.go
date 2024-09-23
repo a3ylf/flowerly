@@ -43,7 +43,7 @@ func setupTestRoutes(app *fiber.App, db *database.Database) {
 }
 func setupRoutes(app *fiber.App, db *database.Database) {
 
-	app.Get("/signup", func(c *fiber.Ctx) error {
+	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signup", fiber.Map{}) // Serve o arquivo HTML
 	})
 
@@ -56,6 +56,9 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		query := `INSERT INTO client (name, email, password, cpf, rua, num) 
 		          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
+    err := auth.EnsureSignup(client); if err != nil {
+      return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+    }
 		password, err := auth.HashPassword(client.Password)
 		id, err := db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
 		if err != nil {
@@ -141,7 +144,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		plant, err := db.GetProductByName(name)
 
 		if err != nil {
-			if err.Error() == fmt.Sprintf("Nenhuma flor encontrada com o nome; %s", name) {
+			if err.Error() == fmt.Sprintf("Nenhuma planta encontrada com o nome; %s", name) {
 				return c.Status(fiber.StatusNotFound).SendString("Couldn't find plant named: " + name)
 			}
 			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")

@@ -42,7 +42,7 @@ CREATE TABLE client (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    cpf varchar(15) not null,
+    cpf VARCHAR(11) UNIQUE not null,
     rua TEXT not null,
     num smallint not null
 );
