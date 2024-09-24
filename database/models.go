@@ -12,15 +12,6 @@ type Plant struct {
     OriginLocation string  `json:"origin_location"`
 }
 
-type Client struct {
-    ID       int    `json:"id"`
-    Name     string `json:"name"`
-    Email    string `json:"email"`
-    Password string `json:"password"`
-    CPF      string `json:"cpf"`
-    Rua      string `json:"rua"`
-    Num      int16  `json:"num"`
-}
 
 type Vendor struct {
     ID       int    `json:"id"`
@@ -28,4 +19,9 @@ type Vendor struct {
     Email    string `json:"email"`
     Password string `json:"password"`
     CPF      string `json:"cpf"`
+}
+type Client struct {
+    Vendor
+    Rua      string `json:"rua"`
+    Num      int16  `json:"num"`
 }

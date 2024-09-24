@@ -54,6 +54,8 @@ CREATE TABLE vendor (
     password VARCHAR(255) NOT NULL,   
     cpf varchar(11) unique not null
 );
+INSERT INTO vendor (name, email, password, cpf)
+VALUES ('Admin', 'admin@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901');
 
 CREATE TABLE purchase (
     id SERIAL PRIMARY KEY,

@@ -42,9 +42,13 @@ func setupTestRoutes(app *fiber.App, db *database.Database) {
 
 }
 func setupRoutes(app *fiber.App, db *database.Database) {
+	type login struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
-		return c.Render("signup", fiber.Map{}) // Serve o arquivo HTML
+		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
 	})
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
@@ -56,16 +60,63 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		query := `INSERT INTO client (name, email, password, cpf, rua, num) 
 		          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
-    err := auth.EnsureSignup(client); if err != nil {
-      return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-    }
+		err := auth.EnsureSignup(&client.Vendor)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
 		password, err := auth.HashPassword(client.Password)
-		id, err := db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
+		_, err = db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create client: %v", err))
 		}
 
-		return c.SendString(fmt.Sprintf("Client created with ID: %d", id))
+		return c.SendString("Client created successfully")
+
+	},
+	)
+	app.Get("/login/vendor", func(c *fiber.Ctx) error {
+		return c.Render("loginVendor", fiber.Map{}) // Serve o arquivo HTML
+	})
+	app.Post("/login/vendor", func(c *fiber.Ctx) error {
+		login := new(login)
+		if err := c.BodyParser(login); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
+		}
+		fmt.Println(login.Email)
+		fmt.Println(login.Password)
+		id, psw, err := db.GetLogin("vendor", login.Email)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+
+		}
+
+		if err = auth.CheckPassword([]byte(psw), []byte(login.Password)); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
+
+		}
+		return c.SendString(fmt.Sprintf("ID: %d", id))
+
+	})
+	app.Post("/signup/vendor", func(c *fiber.Ctx) error {
+		client := new(database.Client)
+		if err := c.BodyParser(client); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
+		}
+		// Consulta SQL para inserir o vendedor
+		query := `INSERT INTO vendor (name, email, password, cpf) 
+		          VALUES ($1, $2, $3, $4)`
+
+		err := auth.EnsureSignup(&client.Vendor)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		password, err := auth.HashPassword(client.Password)
+		_, err = db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create vendoir: %v", err))
+		}
+
+		return c.SendString("Vendor created successfully")
 
 	},
 	)
