@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras</title>
+    <style>
+        .cart {
+            margin: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+
+        .checkout-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Carrinho de Compras</h1>
+
+    <div class="cart">
+        <ul id="cart-items"></ul>
+        <p class="total">Total: R$ <span id="cart-total">0.00</span></p>
+        <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
+    </div>
+
+    <a href="view-plants.html">Continuar Comprando</a>
+
+    <script>
+        // Função para carregar itens do carrinho
+        function loadCart() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cartItems = document.getElementById('cart-items');
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<li>Carrinho vazio</li>';
+            } else {
+                cartItems.innerHTML = '';
+                cart.forEach(function(item, index) {
+                    let li = document.createElement('li');
+                    li.className = 'cart-item';
+                    li.innerHTML = `<span>${item.name}</span> <span>R$ ${item.price.toFixed(2)}</span>`;
+                    cartItems.appendChild(li);
+                    total += item.price;
+                });
+            }
+
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+        }
+
+        // Função para finalizar a compra
+        function checkout() {
+            alert("Compra finalizada com sucesso!");
+            localStorage.removeItem('cart'); // Limpa o carrinho após a compra
+            window.location.href = "/plants"; // Redireciona o usuário após a compra
+        }
+
+        // Carregar o carrinho quando a página abrir
+        window.onload = loadCart;
+    </script>
+</body>
+</html>
