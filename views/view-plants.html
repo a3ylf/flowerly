@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
+    <style>
+        
+
+    </style>
+    <script>
+    $(".cart-icon").click(function goToCart(){
+
+    })       </script>
 </head>
 <body>
     <h1>{{.Title}}</h1>
@@ -21,7 +29,20 @@
         <li>No plants found.</li>
     {{end}}
     </ul>
-    <a href="/">Voltar para a Página Inicial</a>
+    <div class="cart-icon" onclick="goToCart()"></div>
+       <a href="cart.html"><img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Carrinho">
+       </a>     </div>
+    <a href="index.html">Voltar para a Página Inicial</a>
+    <script>
+        // Função para adicionar um item ao carrinho
+        function addToCart(name, price) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let item = { name: name, price: parseFloat(price) };
+            cart.push(item);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert(name + " foi adicionado ao carrinho!");
+        }
+    </script>
 </body>
 </html>
 
