@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Cliente</title>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,56 +20,94 @@
         }
 
         h1 {
-            color: #333;
+            color: #563808;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
         }
 
         form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            background-color: #F4F2D5;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            width: 320px;
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s ease-in-out;
         }
 
         label {
-            margin: 10px 0 5px;
+            margin: 12px 0 5px;
+            font-size: 1rem;
+            color: #563808;
         }
 
         input[type="email"],
         input[type="password"] {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-bottom: 15px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #78D75B;
         }
 
         input[type="submit"],
         .CadastraButton {
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             color: white;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         input[type="submit"] {
-            background-color: #007bff; /* Azul para o botão de login */
+            background-color: #F35BAF; 
         }
 
         input[type="submit"]:hover {
-            background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+            background-color: #D42E8E; 
+            transform: scale(1.03);
         }
 
         .CadastraButton {
-            background-color: #28a745; /* Verde para o botão de cadastrar */
+            background-color: #78D75B; 
         }
 
         .CadastraButton:hover {
-            background-color: #218838; 
+            background-color: #5BB546; 
+            transform: scale(1.03);
         }
+
+        .back {
+            position: fixed; 
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            color: #563808;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .back:hover{
+            color: #D42E8E;
+        }
+
+        .back svg {
+            margin-right: 5px;
+        }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
     <script>
@@ -78,6 +119,12 @@
     </script>
 </head>
 <body>
+
+    <a href="index.html" class="back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar
+    </a>
+
     <h1>Login Cliente</h1>
     <form action="/login/client" method="post">
         <label for="email">Email:</label>

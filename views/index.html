@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,46 +9,48 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(to bottom, #e6f7ff, #f0fff4);
-            color: #555;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
+    color: #563808;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+}
 
-        h1 {
-            font-weight: 500;
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-top: 20px;
-            text-align: center;
-        }
+h1 {
+    font-weight: 500;
+    font-size: 2.8rem;
+    color: #563808;
+    margin-top: 30px;
+    text-align: center;
+}
 
-        nav {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 1200px;
-            background-color: #009688;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-        }
+nav {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #78D75B;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+}
 
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        nav ul li {
+nav ul li {
     position: relative;
     margin: 0 20px;
 }
@@ -55,13 +58,14 @@
 nav ul li a {
     text-decoration: none;
     color: white;
-    padding: 15px 20px;
-    font-size: 1.1rem;
-    transition: background 0.3s, transform 0.3s;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.3s ease;
 }
 
 nav ul li:hover > a {
-    background-color: #00796b;
+    background-color: #F35BAF;
     border-radius: 5px;
 }
 
@@ -69,7 +73,7 @@ nav ul li ul {
     display: none;
     position: absolute;
     background-color: white;
-    top: 55px;
+    top: 150%;
     left: 0;
     border-radius: 5px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -78,79 +82,88 @@ nav ul li ul {
     z-index: 10;
 }
 
-nav ul li:hover ul {
+nav ul li:hover ul,
+nav ul li ul:hover {
     display: block;
 }
 
 nav ul li ul li {
-    margin: 0;
+    position: relative;
 }
 
 nav ul li ul li a {
-    color: #333;
+    color: #78D75B;
     padding: 10px 20px;
     display: block;
     white-space: nowrap;
+    transition: background 0.2s;
 }
 
 nav ul li ul li a:hover {
     background-color: #f0f0f0;
-    border-radius: 0;
 }
-        nav ul li:hover ul {
-            display: block;
-        }
 
-        .hero {
-            width: 100%;
-            max-width: 1200px;
-            margin: 40px auto;
-            text-align: center;
-        }
+.hero {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1;
+}
 
-        .hero img {
-            max-width: 400px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+.hero img {
+    margin-top: 30px;
+    height: auto;
+    max-width: 40%;
+    border-radius: 100px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
 
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            color: #888;
-            font-size: 0.9rem;
-        }
+.hero img:hover {
+    transform: scale(1.05);
+}
 
-        footer p {
-            margin: 10px 0;
-        }
+footer {
+    width: 100%;
+    margin-top: 50px;
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    padding: 20px 0;
+}
 
-        footer a {
-            color: #009688;
-            text-decoration: none;
-            font-weight: 500;
-        }
+footer p {
+    margin: 5px 0;
+    color: #563808;
+}
 
-        footer a:hover {
-            text-decoration: underline;
-        }
+footer a {
+    color: #78D75B;
+    text-decoration: none;
+    font-weight: 500;
+}
 
-        
+footer a:hover {
+    text-decoration: underline;
+}
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
 
     <h1>Floricultura APM</h1>
-    
-    <nav class="nav">
+
+    <nav>
         <ul>
             <li><a href="index.html">Início</a></li>
             <li><a href="view-plants.html">Produtos</a></li>
             <li class="dropC">
                 <a href="#">Perfil</a>
-                <ul class="dropdownC">
+                <ul>
                     <li><a href="loginClient.html">Login Cliente</a></li>
                     <li><a href="loginVendor.html">Login Funcionário</a></li>
                 </ul>
@@ -159,13 +172,16 @@ nav ul li ul li a:hover {
     </nav>
 
     <div class="hero">
-        <img src="https://thumbs.dreamstime.com/b/log%C3%B3tipo-da-floricultura-s%C3%ADmbolo-vetorial-floral-isolado-num-fundo-branco-187252308.jpg" alt="Floricultura Logo">
+        <a href="view-plants.html">
+            <img src="images/Flowerly_img.svg" alt="Floricultura Logo">
+        </a>
     </div>
 
     <footer>
         <p>&copy; 2024 Floricultura APM - Todos os direitos reservados.</p>
-        <p>Desenvolvido como projeto final da disciplina de Banco de Dados</a></p>
+        <p>Desenvolvido como projeto final da disciplina de Banco de Dados</p>
     </footer>
-   
+
 </body>
+
 </html>
