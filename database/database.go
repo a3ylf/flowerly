@@ -43,15 +43,15 @@ func InitDB() *Database {
 		db: db,
 	}
 }
-func (db Database) GetLogin(table, email string) (int, string, error) {
-	var id int
+func (db Database) GetLogin(table, email string) (string, string, error) {
+	var name string
 	var psw string
-	err := db.db.QueryRow(fmt.Sprintf("SELECT id, password FROM %s WHERE email = $1;", table), email).Scan(&id, &psw)
+	err := db.db.QueryRow(fmt.Sprintf("SELECT name, password FROM %s WHERE email = $1;", table), email).Scan(&name, &psw)
 	if err != nil {
 
-		return 0, "", err
+		return "", "", err
 	}
-	return id, psw, nil
+	return name, psw, nil
 }
 
 func (db Database) Create(query string, args ...interface{}) (int, error) {

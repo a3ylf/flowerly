@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/a3ylf/flowerly/auth"
 	"github.com/a3ylf/flowerly/database"
@@ -38,6 +39,29 @@ func setupTestRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to fetch clients")
 		}
 		return c.JSON(clients)
+	})
+	app.Get("/vendors", func(c *fiber.Ctx) error {
+		vendors, err := db.GetVendors()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to fetch vendors")
+		}
+		return c.JSON(vendors)
+	})
+	app.Get("/cookies", func(c *fiber.Ctx) error {
+		ret := ""
+		current := c.Cookies("vendor")
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie para Vendor não encontrado")
+		} else {
+			ret = fmt.Sprint(ret + "\nValor do cookie Vendor: " + current)
+		}
+		current = c.Cookies("client")
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie para cliente não encontrado")
+		} else {
+			ret = fmt.Sprint(ret + "\nValor do cookie Cliente: " + current)
+		}
+		return c.Status(fiber.StatusOK).SendString(ret)
 	})
 
 }
@@ -77,14 +101,16 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	app.Get("/login/vendor", func(c *fiber.Ctx) error {
 		return c.Render("loginVendor", fiber.Map{}) // Serve o arquivo HTML
 	})
-	app.Post("/login/vendor", func(c *fiber.Ctx) error {
+	app.Get("/login/client", func(c *fiber.Ctx) error {
+		return c.Render("loginClient", fiber.Map{}) // Serve o arquivo HTML
+	})
+	app.Post("/login/client", func(c *fiber.Ctx) error {
 		login := new(login)
 		if err := c.BodyParser(login); err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
 		}
-		fmt.Println(login.Email)
-		fmt.Println(login.Password)
-		id, psw, err := db.GetLogin("vendor", login.Email)
+		log.Println(login.Email + " se conectou")
+		name, psw, err := db.GetLogin("client", login.Email)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 
@@ -94,7 +120,37 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
 
 		}
-		return c.SendString(fmt.Sprintf("ID: %d", id))
+		cookie := new(fiber.Cookie)
+		cookie.Name = "client"
+		cookie.Value = name
+		cookie.Expires = time.Now().Add(3 * time.Hour)
+		c.Cookie(cookie)
+		return c.SendString(fmt.Sprintf("Login feito corretamente para cliente de nome: %s", name))
+
+	})
+	app.Post("/login/vendor", func(c *fiber.Ctx) error {
+		login := new(login)
+		if err := c.BodyParser(login); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
+		}
+		fmt.Println(login.Email)
+		fmt.Println(login.Password)
+		name, psw, err := db.GetLogin("vendor", login.Email)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+
+		}
+
+		if err = auth.CheckPassword([]byte(psw), []byte(login.Password)); err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
+
+		}
+		cookie := new(fiber.Cookie)
+		cookie.Name = "vendor"
+		cookie.Value = name
+		cookie.Expires = time.Now().Add(3 * time.Hour)
+		c.Cookie(cookie)
+		return c.SendString(fmt.Sprintf("Login feito corretamente para vendedor de nome: %s", name))
 
 	})
 	app.Post("/signup/vendor", func(c *fiber.Ctx) error {
@@ -113,13 +169,34 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		password, err := auth.HashPassword(client.Password)
 		_, err = db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create vendoir: %v", err))
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create vendor: %v", err))
 		}
 
 		return c.SendString("Vendor created successfully")
 
 	},
 	)
+	app.Get("/logout", func(c *fiber.Ctx) error {
+
+		cookie := c.Cookies("client")
+
+		if cookie != "" {
+			c.Cookie(&fiber.Cookie{
+				Name:    "client",
+				Expires: time.Now().Add(-time.Hour),
+			})
+		}
+		cookie = c.Cookies("vendor")
+
+		if cookie != "" {
+			c.Cookie(&fiber.Cookie{
+				Name:    "vendor",
+				Expires: time.Now().Add(-time.Hour),
+			})
+		}
+
+		return c.SendString("Todos os cookies foram deletados!")
+	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
@@ -132,7 +209,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.Render("view-plants", fiber.Map{
+		return c.JSON(fiber.Map{
 			"Title":  "Todas as plantas a venda",
 			"Plants": plants,
 		})
@@ -142,7 +219,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.Render("view-plants", fiber.Map{
+		return c.JSON( fiber.Map{
 			"Title":  "Todas as plantas a venda de mari (Imperdiveis)",
 			"Plants": plants,
 		})
@@ -157,7 +234,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.Render("view-plants", fiber.Map{
+		return c.JSON(fiber.Map{
 			"Title":  "Todas as plantas da categoria " + category,
 			"Plants": plants,
 		})
@@ -183,7 +260,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.Render("view-plants", fiber.Map{
+		return c.JSON(fiber.Map{
 			"Title":  "Todas as plantas de valor abaixo de " + max,
 			"Plants": plants,
 		})
@@ -201,7 +278,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")
 		}
 
-		return c.Render("view-full-plant", fiber.Map{
+		return c.JSON(fiber.Map{
 			"Title": "Planta: " + name,
 			"Plant": plant,
 		})
