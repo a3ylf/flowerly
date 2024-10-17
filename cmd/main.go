@@ -17,17 +17,17 @@ import (
 
 func main() {
 	engine := html.New("./views", ".html")
+
+	// Criando o app Fiber e configurando a engine
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
-
 	db := database.InitDB()
 	setupTestRoutes(app, db)
 	setupRoutes(app, db)
-	// Endpoint para retornar todos os produtos
 
 	// Servir a página HTML estática
-	app.Static("/", "./public")
+	app.Static("/", "./views")
 
 	log.Fatal(app.Listen(":3000"))
 }
@@ -104,6 +104,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	app.Get("/login/client", func(c *fiber.Ctx) error {
 		return c.Render("loginClient", fiber.Map{}) // Serve o arquivo HTML
 	})
+
 	app.Post("/login/client", func(c *fiber.Ctx) error {
 		login := new(login)
 		if err := c.BodyParser(login); err != nil {
@@ -145,6 +146,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
 
 		}
+		log.Println(login.Email + " se conectou")
 		cookie := new(fiber.Cookie)
 		cookie.Name = "vendor"
 		cookie.Value = name
@@ -178,22 +180,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	)
 	app.Get("/logout", func(c *fiber.Ctx) error {
 
-		cookie := c.Cookies("client")
-
-		if cookie != "" {
-			c.Cookie(&fiber.Cookie{
-				Name:    "client",
-				Expires: time.Now().Add(-time.Hour),
-			})
-		}
-		cookie = c.Cookies("vendor")
-
-		if cookie != "" {
-			c.Cookie(&fiber.Cookie{
-				Name:    "vendor",
-				Expires: time.Now().Add(-time.Hour),
-			})
-		}
+		c.ClearCookie()
 
 		return c.SendString("Todos os cookies foram deletados!")
 	})
@@ -219,7 +206,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.JSON( fiber.Map{
+		return c.JSON(fiber.Map{
 			"Title":  "Todas as plantas a venda de mari (Imperdiveis)",
 			"Plants": plants,
 		})
