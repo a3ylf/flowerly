@@ -3,21 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>{{.Plant.Name}} - Detalhes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .plant-details {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .plant-details img {
+            max-width: 100%;
+            height: auto;
+        }
+        .back-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{.Title}}</h1>
-    
-    <h2>{{.Plant.Name}}</h2>
-    <p><strong>Nome Científico:</strong> {{.Plant.ScientificName}}</p>
-    <p><strong>Descrição:</strong> {{.Plant.Description}}</p>
-    <p><strong>Categoria:</strong> {{.Plant.Category}}</p>
-    <p><strong>Preço:</strong> R$ {{.Plant.Price}}</p>
-    <p><strong>Quantidade em Estoque:</strong> {{.Plant.StockQuantity}}</p>
-    <p><strong>URL da Imagem:</strong> <img src="{{.Plant.ImageURL}}" alt="{{.Plant.Name}}" width="200"></p>
-    <p><strong>Local de Origem:</strong> {{.Plant.OriginLocation}}</p>
-    
-    <a href="/">Voltar para a Página Inicial</a>
+    <a href="view-plants.html" class="back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar
+    </a>
+    <div class="plant-details">
+        <h1>{{.Plant.Name}}</h1>
+        <img src="{{.Plant.ImageURL}}" alt="{{.Plant.Name}}">
+        <p><strong>Nome Científico:</strong> {{.Plant.ScientificName}}</p>
+        <p><strong>Categoria:</strong> {{.Plant.Category}}</p>
+        <p><strong>Preço:</strong> R$ {{.Plant.Price}}</p>
+        <p><strong>Descrição:</strong> {{.Plant.Description}}</p>
+        <a href="/plants/all" class="back-button">Voltar</a>
+    </div>
 </body>
 </html>
-
