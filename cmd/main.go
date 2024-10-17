@@ -5,7 +5,11 @@ import (
 	"log"
 	"strconv"
 	"strings"
+<<<<<<< Updated upstream
 
+=======
+	"time"
+>>>>>>> Stashed changes
 	"github.com/a3ylf/flowerly/auth"
 	"github.com/a3ylf/flowerly/database"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +30,7 @@ func main() {
 	// Endpoint para retornar todos os produtos
 
 	// Servir a página HTML estática
-	app.Static("/", "./public")
+	app.Static("/", "./views")
 
 	log.Fatal(app.Listen(":3000"))
 }
@@ -128,15 +132,24 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	})
 
 	app.Get("/plants/all", func(c *fiber.Ctx) error {
+		// Obtém a lista de plantas do banco de dados
 		plants, err := db.GetProducts()
 		if err != nil {
 			return err
 		}
+<<<<<<< Updated upstream
 		return c.Render("view-plants", fiber.Map{
 			"Title":  "Todas as plantas a venda",
+=======
+	
+		// Renderiza a página HTML com os dados das plantas
+		return c.Render("view-plants", fiber.Map{
+			"Title":  "Todas as plantas à venda",
+>>>>>>> Stashed changes
 			"Plants": plants,
 		})
 	})
+	
 	app.Get("/plants/mari", func(c *fiber.Ctx) error {
 		plants, err := db.GetProductsFromMari()
 		if err != nil {
@@ -190,19 +203,21 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	})
 	// Rota que pega o nome diretamente no caminho
 	app.Get("/plant/name/:name", func(c *fiber.Ctx) error {
-		name := c.Params("name")
-		name = strings.NewReplacer("%20", " ").Replace(name)
-		plant, err := db.GetProductByName(name)
-
+		plantName := c.Params("name")
+		
+		// Buscar a planta pelo nome
+		plant, err := db.GetPlantByName(plantName) // Supondo que exista essa função no seu banco
 		if err != nil {
-			if err.Error() == fmt.Sprintf("Nenhuma planta encontrada com o nome; %s", name) {
-				return c.Status(fiber.StatusNotFound).SendString("Couldn't find plant named: " + name)
-			}
-			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")
+			return err
 		}
+<<<<<<< Updated upstream
 
 		return c.Render("view-full-plant", fiber.Map{
 			"Title": "Planta: " + name,
+=======
+		
+		return c.Render("view-full-plant", fiber.Map{
+>>>>>>> Stashed changes
 			"Plant": plant,
 		})
 	})
