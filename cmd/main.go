@@ -42,7 +42,19 @@ type item struct {
 	Ammount int `json:"ammount"`
 }
 type cartcookie struct {
-	Itens []item `json:"itens"`
+	Itens []item  `json:"itens"`
+	Price float64 `json:"price"`
+}
+
+func processcart(cart string) (*cartcookie, error) {
+	cartc := new(cartcookie)
+	err := json.Unmarshal([]byte(cart), cartc)
+	return cartc, err
+}
+func processlogin(log string) (*logincookie, error) {
+	login := new(logincookie)
+	err := json.Unmarshal([]byte(log), login)
+	return login, err
 }
 
 func setupTestRoutes(app *fiber.App, db *database.Database) {
@@ -109,11 +121,86 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+	app.Get("/pedidos", func(c*fiber.Ctx)error {
+    cl := c.Cookies("client")
+    client,err := processlogin(cl)
+    if err != nil{
+        c.Status(fiber.StatusBadRequest).SendString("Cliente não conectado")
+    }
+    pedidos, err:= db.GetClientPurchases(client.Id)
+
+    if err != nil{
+        c.Status(fiber.StatusBadRequest).SendString(err.Error())
+    }
+    return c.JSON(pedidos)
+  })
 
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
 	})
-	app.Get("/addplant/:id/:ammount", func(c *fiber.Ctx) error {
+	app.Get("/purchase", func(c *fiber.Ctx) error {
+		clientcookie := c.Cookies("client")
+		cartcookie := c.Cookies("cart")
+		if clientcookie == "" {
+			fmt.Println("Redirecionando para /login/client")
+			time.Sleep(time.Second)
+			return c.Redirect("/login/client")
+		}
+		if cartcookie == "" {
+			fmt.Println("Redirecionando para /")
+			time.Sleep(time.Second)
+			return c.Redirect("/")
+		}
+		cart, err := processcart(cartcookie)
+		login, err := processlogin(clientcookie)
+		method := c.Query("payment")
+		discount := c.QueryBool("discount", false)
+
+		price := float64(cart.Price)
+		if method == "berries" {
+			price *= 100 // um berry é um centavo
+		}
+		if discount {
+			price *= 0.9
+		}
+		if method == "" {
+			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("metodo de pagamento não entregue"))
+		}
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Error unmarshaling: ", err))
+		}
+		cartID, err := db.Create("INSERT INTO cart (client_id) VALUES ($1) RETURNING id", login.Id)
+		if err != nil {
+			log.Printf("Erro ao criar carrinho: %v", err)
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("erro ao criar carrinho: ", err))
+		}
+		log.Printf("Carrinho criado ID: %d", cartID)
+		for _, item := range cart.Itens {
+			log.Printf("Tentando inserir: Product ID: %d, Quantity: %d", item.Id, item.Ammount)
+
+			id := item.Id
+			quantity := item.Ammount
+
+			_, err = db.Db.Exec("INSERT INTO cart_item (cart_id, product_id, quantity) VALUES ($1, $2, $3)", cartID, id, quantity)
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Erro ao adicionar item ao carrinho: %d", item.Id))
+			}
+
+			log.Printf("Item inserido com sucesso: Cart ID: %d, Product ID: %d", cartID, id)
+		}
+		c.ClearCookie("cart")
+
+		id, err := db.CreatePurchase(cartID, price, "esperando efetivação", method)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Erro ao confirmar compra"))
+		}
+
+		return c.Status(fiber.StatusOK).SendString(fmt.Sprintf("Compra realizada corretamente, ID: ", id))
+	})
+
+
+	app.Get("/addplant/:id/:ammount/:price", func(c *fiber.Ctx) error {
 
 		id, err := c.ParamsInt("id")
 		if err != nil {
@@ -122,6 +209,10 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		ammount, err := c.ParamsInt("ammount")
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to fetch params: ", err))
+		}
+		price, err := strconv.ParseFloat(c.Params("price"), 64)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to convert: ", err))
 		}
 
 		cartcontent := c.Cookies("cart")
@@ -132,6 +223,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 						Ammount: ammount,
 					},
 				},
+				Price: price * float64(ammount),
 			})
 			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Error marshaling: ", err))
@@ -154,12 +246,14 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		for item := range cart.Itens {
 			if cart.Itens[item].Id == id {
 				cart.Itens[item].Ammount += ammount
+				cart.Price += price * float64(ammount)
 				already = true
 				break
 			}
 		}
 		if !already {
 			cart.Itens = append(cart.Itens, item{Id: id, Ammount: ammount})
+			cart.Price += float64(ammount) * price
 		}
 
 		newcookie, err := json.Marshal(cart)
@@ -237,6 +331,10 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		cookie.Value = string(value)
 		cookie.Expires = time.Now().Add(3 * time.Hour)
 		c.Cookie(cookie)
+		fmt.Println(c.Response().StatusCode())
+		if c.Response().StatusCode() == 302 {
+			return c.Redirect("/purchase")
+		}
 		return c.SendString(fmt.Sprintf("Login feito corretamente para cliente de nome: %s", name))
 
 	})

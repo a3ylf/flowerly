@@ -1,7 +1,7 @@
 package database
 
 func (db *Database) GetClients() ([]Client, error) {
-	rows, err := db.db.Query(`SELECT id, name, email, password, cpf, rua, num FROM client`)
+	rows, err := db.Db.Query(`SELECT id, name, email, password, cpf, rua, num FROM client`)
 		if err != nil {
 		    return []Client{},err
 		}
@@ -19,7 +19,7 @@ func (db *Database) GetClients() ([]Client, error) {
 
 }
 func (db *Database) GetVendors() ([]Vendor, error) {
-	rows, err := db.db.Query(`SELECT id, name, email, password, cpf FROM vendor`)
+	rows, err := db.Db.Query(`SELECT id, name, email, password, cpf FROM vendor`)
 		if err != nil {
 		    return []Vendor{},err
 		}

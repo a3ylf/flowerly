@@ -12,7 +12,7 @@ import (
 )
 
 type Database struct {
-	db *sql.DB
+	Db *sql.DB
 }
 
 func InitDB() *Database {
@@ -40,14 +40,14 @@ func InitDB() *Database {
 	}
 
 	return &Database{
-		db: db,
+		Db: db,
 	}
 }
 func (db Database) GetLogin(table, email string) (int,string, string, error) {
   var id int
 	var name string
 	var psw string
-	err := db.db.QueryRow(fmt.Sprintf("SELECT id, name, password FROM %s WHERE email = $1;", table), email).Scan(&id, &name, &psw)
+	err := db.Db.QueryRow(fmt.Sprintf("SELECT id, name, password FROM %s WHERE email = $1;", table), email).Scan(&id, &name, &psw)
 	if err != nil {
 
 		return -1,"", "", err
@@ -57,9 +57,16 @@ func (db Database) GetLogin(table, email string) (int,string, string, error) {
 
 func (db Database) Create(query string, args ...interface{}) (int, error) {
 	var id int
-	err := db.db.QueryRow(query, args...).Scan(&id)
+	err := db.Db.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create record: %v", err)
 	}
 	return id, nil
+}
+func (db Database) Createcartitem(query string, args ...interface{}) (error) {
+	_,err := db.Db.Exec(query, args...)
+	if err != nil {
+		return  fmt.Errorf("failed to create record: %v", err)
+	}
+	return  nil
 }
