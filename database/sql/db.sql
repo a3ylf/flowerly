@@ -64,7 +64,9 @@ CREATE TABLE purchase (
     purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
-    payment_method VARCHAR(50) NOT NULL
+    payment_method VARCHAR(50) NOT NULL,
+    vendor_id INT NULL,
+  FOREIGN KEY(vendor_id) REFERENCES vendor(id)
 );
 
 

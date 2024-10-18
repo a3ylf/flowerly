@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -32,7 +33,20 @@ func main() {
 	log.Fatal(app.Listen(":3000"))
 }
 
+type logincookie struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+type item struct {
+	Id      int `json:"id"`
+	Ammount int `json:"ammount"`
+}
+type cartcookie struct {
+	Itens []item `json:"itens"`
+}
+
 func setupTestRoutes(app *fiber.App, db *database.Database) {
+
 	app.Get("/clients", func(c *fiber.Ctx) error {
 		clients, err := db.GetClients()
 		if err != nil {
@@ -48,19 +62,44 @@ func setupTestRoutes(app *fiber.App, db *database.Database) {
 		return c.JSON(vendors)
 	})
 	app.Get("/cookies", func(c *fiber.Ctx) error {
+		cook := new(logincookie)
+		var err error
 		ret := ""
 		current := c.Cookies("vendor")
+
 		if current == "" {
 			ret = fmt.Sprint(ret + "\nCookie para Vendor não encontrado")
 		} else {
-			ret = fmt.Sprint(ret + "\nValor do cookie Vendor: " + current)
+			err := json.Unmarshal([]byte(current), cook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+			ret = fmt.Sprint(ret+"\nValor do cookie Vendor: "+cook.Name+" Id: ", cook.Id)
 		}
 		current = c.Cookies("client")
 		if current == "" {
 			ret = fmt.Sprint(ret + "\nCookie para cliente não encontrado")
 		} else {
+			err = json.Unmarshal([]byte(current), cook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+
 			ret = fmt.Sprint(ret + "\nValor do cookie Cliente: " + current)
 		}
+		cartcook := new(cartcookie)
+		current = c.Cookies("cart")
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie cart não encontrado")
+		} else {
+			err = json.Unmarshal([]byte(current), cartcook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+
+			ret = fmt.Sprint(ret + "\nValor do cookie Cart: " + current)
+		}
+
 		return c.Status(fiber.StatusOK).SendString(ret)
 	})
 
@@ -74,6 +113,70 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
 	})
+	app.Get("/addplant/:id/:ammount", func(c *fiber.Ctx) error {
+
+		id, err := c.ParamsInt("id")
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to fetch params: ", err))
+		}
+		ammount, err := c.ParamsInt("ammount")
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to fetch params: ", err))
+		}
+
+		cartcontent := c.Cookies("cart")
+		if cartcontent == "" {
+			jcart, err := json.Marshal(cartcookie{
+				Itens: []item{
+					item{Id: id,
+						Ammount: ammount,
+					},
+				},
+			})
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Error marshaling: ", err))
+			}
+			cookie := new(fiber.Cookie)
+			cookie.Name = "cart"
+			cookie.Value = string(jcart)
+			cookie.Expires = time.Now().Add(3 * time.Hour)
+			cookie.HTTPOnly = false
+			c.Cookie(cookie)
+			return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
+		}
+		cart := new(cartcookie)
+		err = json.Unmarshal([]byte(cartcontent), cart)
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Error unmarshaling: ", err))
+		}
+		already := false
+		for item := range cart.Itens {
+			if cart.Itens[item].Id == id {
+				cart.Itens[item].Ammount += ammount
+				already = true
+				break
+			}
+		}
+		if !already {
+			cart.Itens = append(cart.Itens, item{Id: id, Ammount: ammount})
+		}
+
+		newcookie, err := json.Marshal(cart)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Error marshaling: ", err))
+		}
+		cookie := new(fiber.Cookie)
+		cookie.Name = "cart"
+		cookie.Value = string(newcookie)
+		cookie.Expires = time.Now().Add(3 * time.Hour)
+		cookie.HTTPOnly = false
+		c.Cookie(cookie)
+
+		return c.Status(fiber.StatusOK).SendString("Succesfully put it in the cart")
+
+	},
+	)
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
 		client := new(database.Client)
@@ -111,7 +214,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
 		}
 		log.Println(login.Email + " se conectou")
-		name, psw, err := db.GetLogin("client", login.Email)
+		id, name, psw, err := db.GetLogin("client", login.Email)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 
@@ -121,9 +224,17 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
 
 		}
+		clientcookie := logincookie{
+			Id:   id,
+			Name: name,
+		}
+		value, err := json.Marshal(clientcookie)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Error marshaling json")
+		}
 		cookie := new(fiber.Cookie)
 		cookie.Name = "client"
-		cookie.Value = name
+		cookie.Value = string(value)
 		cookie.Expires = time.Now().Add(3 * time.Hour)
 		c.Cookie(cookie)
 		return c.SendString(fmt.Sprintf("Login feito corretamente para cliente de nome: %s", name))
@@ -136,10 +247,18 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		}
 		fmt.Println(login.Email)
 		fmt.Println(login.Password)
-		name, psw, err := db.GetLogin("vendor", login.Email)
+		id, name, psw, err := db.GetLogin("vendor", login.Email)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 
+		}
+		clientcookie := logincookie{
+			Id:   id,
+			Name: name,
+		}
+		value, err := json.Marshal(clientcookie)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Error marshaling json")
 		}
 
 		if err = auth.CheckPassword([]byte(psw), []byte(login.Password)); err != nil {
@@ -149,7 +268,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		log.Println(login.Email + " se conectou")
 		cookie := new(fiber.Cookie)
 		cookie.Name = "vendor"
-		cookie.Value = name
+		cookie.Value = string(value)
 		cookie.Expires = time.Now().Add(3 * time.Hour)
 		c.Cookie(cookie)
 		return c.SendString(fmt.Sprintf("Login feito corretamente para vendedor de nome: %s", name))
