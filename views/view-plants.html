@@ -6,6 +6,7 @@
     <title>{{.Title}}</title>
     <style>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         
 
     </style>
@@ -14,6 +15,8 @@
 
     })       </script>
 =======
+=======
+>>>>>>> Stashed changes
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -27,19 +30,29 @@
         }
         .container {
             display: flex;
+<<<<<<< Updated upstream
             flex-wrap: wrap; /* Permite que os itens se reorganizem em múltiplas linhas */
+=======
+            flex-wrap: wrap; /* Itens se reorganizam em múltiplas linhas */
+>>>>>>> Stashed changes
             gap: 20px; /* Espaçamento entre os itens */
             justify-content: space-around; /* Distribui os itens de forma equilibrada */
         }
 
         .plant-item {
+<<<<<<< Updated upstream
             display: block; /* Permite que o link ocupe todo o espaço */
             width: 200px; /* Tamanho menor do card da planta */
+=======
+            display: block;
+            width: 200px;
+>>>>>>> Stashed changes
             padding: 15px;
             border: 1px solid #ccc;
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+<<<<<<< Updated upstream
             transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave no hover */
             text-decoration: none; /* Remove sublinhado do link */
             color: inherit; /* Herda a cor do texto sem o azul padrão */
@@ -53,6 +66,21 @@
 
         .plant-item img {
             width: 100%; /* Assegura que a imagem ocupe toda a largura do card */
+=======
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit; /* Herda a cor do texto */
+        }
+
+        .plant-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .plant-item img {
+            width: 100%;
+>>>>>>> Stashed changes
             border-radius: 8px;
         }
 
@@ -66,11 +94,14 @@
             margin: 5px 0;
         }
 
+<<<<<<< Updated upstream
         .plant-item a:hover {
             color: #4CAF50; /* Cor verde para indicar interatividade no hover */
             text-decoration: underline; /* Adiciona sublinhado no hover, se desejado */
         }
 
+=======
+>>>>>>> Stashed changes
         .filter-form {
             text-align: center;
             margin-bottom: 20px;
@@ -90,7 +121,22 @@
             border-radius: 5px;
             cursor: pointer;
         }
+<<<<<<< Updated upstream
     </style>
+>>>>>>> Stashed changes
+=======
+
+        a.back {
+            display: inline-block;
+            margin: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a.back:hover {
+            text-decoration: underline;
+        }
+    </style>
+
 >>>>>>> Stashed changes
 </head>
 <body>
@@ -100,16 +146,25 @@
     </a>
     <h1>{{.Title}}</h1>
 
+<<<<<<< Updated upstream
     <div class="filter-form">
         <form method="GET" action="/plants/filter">
             <label for="category">Categoria:</label>
             <select name="category" id="category">
+=======
+    <!-- Filtro de plantas por categoria e preço -->
+    <div class="filter-form">
+        <form action="/plants/category" method="GET">
+            <label for="options">Escolha uma categoria:</label>
+            <select id="options" name="category">
+>>>>>>> Stashed changes
                 <option value="all">Todas</option>
                 <option value="flores">Flores</option>
                 <option value="plantas">Plantas</option>
                 <option value="arvores">Árvores</option>
                 <option value="suculentas">Suculentas</option>
             </select>
+<<<<<<< Updated upstream
 
             <label for="price">Preço:</label>
             <select name="price" id="price">
@@ -123,12 +178,30 @@
         </form>
     </div>
 
+=======
+            <button type="submit"  class = "filter-button">Filtrar</button>
+        </form>
+        
+
+        <div>
+            <h2>Pesquisar por Valor Máximo</h2>
+            <form action="/plants/price" method="GET">
+                    <input type="number" name="max" placeholder="Preço">
+    
+                <button type="submit" class="filter-button">Pesquisar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de produtos -->
+>>>>>>> Stashed changes
     <div class="container">
         {{range .Plants}}
         <a href="/plant/name/{{.Name}}" class="plant-item">
             <img src="{{.ImageURL}}" alt="{{.Name}}">
             <h2>{{.Name}}</h2>
             <p><strong>Preço:</strong> R$ {{.Price}}</p>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
             <p><strong>URL da Imagem:</strong> <img src="{{.ImageURL}}" alt="{{.Name}}" width="200"></p>
             <a href="/plant/name/{{.Name}}">Ver Detalhes</a>
@@ -152,12 +225,17 @@
         }
     </script>
 =======
+=======
+>>>>>>> Stashed changes
             <p><strong>Categoria:</strong> {{.Category}}</p>
         </a>
         {{else}}
             <p>No plants found.</p>
         {{end}}
     </div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 </body>
 </html>

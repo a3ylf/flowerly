@@ -47,6 +47,9 @@ CREATE TABLE client (
     num smallint not null
 );
 
+INSERT INTO client (name, email, password, cpf,rua,num)
+VALUES ('client', 'client@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901','bruno almeida', 122);
+
 CREATE TABLE vendor (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -57,10 +60,29 @@ CREATE TABLE vendor (
 INSERT INTO vendor (name, email, password, cpf)
 VALUES ('Admin', 'admin@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901');
 
+create table cart (
+    id serial primary key,
+    client_id int references client(id) on delete cascade
+);
+
+create table cart_item (
+    cart_id int references cart(id) on delete cascade,     
+    product_id int references plants(id) on delete cascade,
+    quantity int not null check (quantity > 0),            
+    primary key (cart_id, product_id)
+);
+INSERT INTO cart (client_id)
+VALUES (1);
+INSERT INTO cart (client_id)
+VALUES (1);
+INSERT INTO cart_item (cart_id,product_id,quantity)
+VALUES (1,3,4);
+INSERT INTO cart_item (cart_id,product_id,quantity)
+VALUES (1,2,5);
+
 CREATE TABLE purchase (
     id SERIAL PRIMARY KEY,
-    customer_id INT NOT NULL,
-    cart_id INT NOT NULL,
+    cart_id INT NOT NULL REFERENCES cart(id) ON DELETE CASCADE,
     purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
@@ -68,26 +90,14 @@ CREATE TABLE purchase (
 );
 
 
-
-
-CREATE TABLE cart (
-    id SERIAL PRIMARY KEY,
-    client_id INT REFERENCES client(id) ON DELETE CASCADE
-);
-
-CREATE TABLE cart_item (
-    cart_id INT REFERENCES cart(id) ON DELETE CASCADE,     
-    product_id INT REFERENCES plants(id) ON DELETE CASCADE,
-    quantity INT NOT NULL CHECK (quantity > 0),            
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (cart_id, product_id)
-);
-
-ALTER TABLE purchase ADD CONSTRAINT fk_customer
-FOREIGN KEY (customer_id) REFERENCES client(id);
-
 ALTER TABLE purchase ADD CONSTRAINT fk_cart
 FOREIGN KEY (cart_id) REFERENCES cart(id);
+
+ALTER TABLE cart_item ADD CONSTRAINT fk_product
+FOREIGN KEY (product_id) REFERENCES plants(id);
+
+
+
 
 CREATE OR REPLACE FUNCTION update_stock(
     p_id INTEGER,
@@ -100,7 +110,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE VIEW client_purchases_view AS
+SELECT 
+    client.id AS client_id,
+    client.name AS client_name,
+    purchase.id AS purchase_id,
+    purchase.purchase_date,
+    purchase.total_amount,
+    purchase.payment_status,
+    purchase.payment_method,
+    cart_item.product_id,
+    plants.name AS product_name,
+    cart_item.quantity
+FROM 
+    client
+JOIN 
+    cart ON client.id = cart.client_id
+JOIN 
+    purchase ON cart.id = purchase.cart_id
+JOIN 
+    cart_item ON cart.id = cart_item.cart_id
+JOIN 
+    plants ON cart_item.product_id = plants.id;
 
 CREATE ROLE boss WITH LOGIN SUPERUSER PASSWORD '123456';
 GRANT ALL PRIVILEGES ON DATABASE flowerly TO boss;
-
