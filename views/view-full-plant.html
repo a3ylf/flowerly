@@ -18,12 +18,13 @@
                 // Redireciona para a rota addplant com o ID da planta e a quantidade
                 window.location.href = `/addplant/${plantId}/${quantity}/${plantPrice}`;
                 alert("Planta adicionada ao carrinho!");
-               let result=  confirm("Deseja continuar comprando?");
-                if (result) {
+
+                let result = confirm("Deseja continuar comprando?");
+                if (result){
                     window.location.href = "/plants/all";
-                }
-                else{
-                    paymentMethod = prompt("Digite o método de pagamento: ");
+                } else {
+                    let paymentMethod = prompt("Digite o método de pagamento: ");
+
                     window.location.href = `/purchase?payment=${paymentMethod}`;
                 }
             } else {
