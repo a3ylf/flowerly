@@ -73,6 +73,49 @@
             margin-right: 10px;
         }
     </style>
+    <title>Plant Details</title>
+    <script>
+        async function fetchPlantData(plantName) {
+            try {
+                const response = await fetch(`/plant/name/${plantName}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch plant data');
+                }
+                const data = await response.json();
+                const plant = data.Plant; // Agora acessa a propriedade 'Plant'
+
+            if (quantity > 0) {
+                // Redireciona para a rota addplant com o ID da planta e a quantidade
+                window.location.href = `/addplant/${plantId}/${quantity}/${plantPrice}`;
+                alert("Planta adicionada ao carrinho!");
+
+                let result = confirm("Deseja continuar comprando?");
+                if (result){
+                    window.location.href = "/plants/all";
+                } else {
+                    let paymentMethod = prompt("Digite o método de pagamento: ");
+
+                    window.location.href = `/purchase?payment=${paymentMethod}`;
+                }
+            } else {
+            
+                alert("Por favor, insira uma quantidade válida.");
+
+            }
+        }catch (error) {
+            console.error(error);
+            alert('Erro ao buscar dados da planta');
+        }}
+        
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const plantName = urlParams.get('name');
+            if (plantName) {
+                fetchPlantData(plantName);
+            }
+        });
+    </script>
 </head>
 <body>
 

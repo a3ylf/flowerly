@@ -266,10 +266,12 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		cookie.HTTPOnly = false
 		c.Cookie(cookie)
 
-		return c.Status(fiber.StatusOK).SendString("Succesfully put it in the cart")
+		return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
 
 	},
 	)
+
+	
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
 		client := new(database.Client)
