@@ -43,19 +43,16 @@ func InitDB() *Database {
 		Db: db,
 	}
 }
-func (db Database) GetLogin(table, email string) (int, string, error) {
-	var id int
+func (db Database) GetLogin(table, email string) (int,string, string, error) {
+  var id int
+	var name string
 	var psw string
-<<<<<<< Updated upstream
-	err := db.db.QueryRow(fmt.Sprintf("SELECT id, password FROM %s WHERE email = $1;", table), email).Scan(&id, &psw)
-=======
 	err := db.Db.QueryRow(fmt.Sprintf("SELECT id, name, password FROM %s WHERE email = $1;", table), email).Scan(&id, &name, &psw)
->>>>>>> Stashed changes
 	if err != nil {
 
-		return 0, "", err
+		return -1,"", "", err
 	}
-	return id, psw, nil
+	return id,name, psw, nil
 }
 
 func (db Database) Create(query string, args ...interface{}) (int, error) {

@@ -18,9 +18,6 @@ func (db *Database) GetClients() ([]Client, error) {
 	return clients,nil
 
 }
-<<<<<<< Updated upstream
-
-=======
 func (db *Database) GetVendors() ([]Vendor, error) {
 	rows, err := db.Db.Query(`SELECT id, name, email, password, cpf FROM vendor`)
 		if err != nil {
@@ -39,4 +36,3 @@ func (db *Database) GetVendors() ([]Vendor, error) {
 	return vendors,nil
 
 }
->>>>>>> Stashed changes

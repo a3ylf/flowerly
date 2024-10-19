@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrinho de Compras</title>
+    <title>Carrinho</title>
     <style>
         .cart {
             margin: 20px;
@@ -30,33 +30,39 @@
     </style>
 </head>
 <body>
-    <h1>Carrinho de Compras</h1>
+    <h1>Carrinho de Compras {{.cartcookie.}}</h1>
 
     <div class="cart">
-        <ul id="cart-items"></ul>
-        <p class="total">Total: R$ <span id="cart-total">0.00</span></p>
+        {{range .cartcookie.Itens}}
+        <div class="cart-item">
+            <span>Planta ID: {{.Id}} - Quantidade: {{.Ammount}}</span>
+            <span>R$ {{.Ammount .Price}}</span>
+        {{else}}
+            <p>No plants found.</p>
+        {{end}}
+        </div>
+        <p class="total">Total: R$ <span id="cart-total">{{.cartcookie.Price}}</span></p>
         <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
     </div>
 
-    <a href="view-plants.html">Continuar Comprando</a>
+    <a href="/plants/all">Continuar Comprando</a>
 
     <script>
         // Função para carregar itens do carrinho
-        function loadCart() {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        function loadCart(cart) {
             let cartItems = document.getElementById('cart-items');
             let total = 0;
 
-            if (cart.length === 0) {
+            if (cart && cart.Itens.length === 0) {
                 cartItems.innerHTML = '<li>Carrinho vazio</li>';
             } else {
                 cartItems.innerHTML = '';
-                cart.forEach(function(item, index) {
+                cart.Itens.forEach(function(item) {
                     let li = document.createElement('li');
                     li.className = 'cart-item';
-                    li.innerHTML = `<span>${item.name}</span> <span>R$ ${item.price.toFixed(2)}</span>`;
+                    li.innerHTML = `<span>Planta ID: ${item.Id} - Quantidade: ${item.Ammount}</span> <span>R$ ${(item.Ammount * item.Price).toFixed(2)}</span>`;
                     cartItems.appendChild(li);
-                    total += item.price;
+                    total += item.Ammount * item.Price;
                 });
             }
 
@@ -67,11 +73,22 @@
         function checkout() {
             alert("Compra finalizada com sucesso!");
             localStorage.removeItem('cart'); // Limpa o carrinho após a compra
-            window.location.href = "/plants"; // Redireciona o usuário após a compra
+            window.location.href = "/purchase"; // Redireciona o usuário após a compra
         }
 
         // Carregar o carrinho quando a página abrir
-        window.onload = loadCart;
+        window.onload = function() {
+            // Aqui você deve carregar os dados do carrinho do cookie ou de uma API
+            let cartContent = JSON.parse(decodeURIComponent(getCookie('cart'))) || { Itens: [], Price: 0 };
+            loadCart(cartContent);
+        };
+
+        // Função para obter o cookie
+        function getCookie(name) {
+            let value = `; ${document.cookie}`;
+            let parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
     </script>
 </body>
 </html>

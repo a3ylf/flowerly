@@ -1,15 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
-<<<<<<< Updated upstream
-
-=======
 	"time"
->>>>>>> Stashed changes
+
 	"github.com/a3ylf/flowerly/auth"
 	"github.com/a3ylf/flowerly/database"
 	"github.com/gofiber/fiber/v2"
@@ -20,14 +18,14 @@ import (
 
 func main() {
 	engine := html.New("./views", ".html")
+
+	// Criando o app Fiber e configurando a engine
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
-
 	db := database.InitDB()
 	setupTestRoutes(app, db)
 	setupRoutes(app, db)
-	// Endpoint para retornar todos os produtos
 
 	// Servir a página HTML estática
 	app.Static("/", "./views")
@@ -35,8 +33,6 @@ func main() {
 	log.Fatal(app.Listen(":3000"))
 }
 
-<<<<<<< Updated upstream
-=======
 type logincookie struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
@@ -61,14 +57,62 @@ func processlogin(log string) (*logincookie, error) {
 	return login, err
 }
 
->>>>>>> Stashed changes
 func setupTestRoutes(app *fiber.App, db *database.Database) {
+
 	app.Get("/clients", func(c *fiber.Ctx) error {
 		clients, err := db.GetClients()
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to fetch clients")
 		}
 		return c.JSON(clients)
+	})
+	app.Get("/vendors", func(c *fiber.Ctx) error {
+		vendors, err := db.GetVendors()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to fetch vendors")
+		}
+		return c.JSON(vendors)
+	})
+	app.Get("/cookies", func(c *fiber.Ctx) error {
+		cook := new(logincookie)
+		var err error
+		ret := ""
+		current := c.Cookies("vendor")
+
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie para Vendor não encontrado")
+		} else {
+			err := json.Unmarshal([]byte(current), cook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+			ret = fmt.Sprint(ret+"\nValor do cookie Vendor: "+cook.Name+" Id: ", cook.Id)
+		}
+		current = c.Cookies("client")
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie para cliente não encontrado")
+		} else {
+			err = json.Unmarshal([]byte(current), cook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+
+			ret = fmt.Sprint(ret + "\nValor do cookie Cliente: " + current)
+		}
+		cartcook := new(cartcookie)
+		current = c.Cookies("cart")
+		if current == "" {
+			ret = fmt.Sprint(ret + "\nCookie cart não encontrado")
+		} else {
+			err = json.Unmarshal([]byte(current), cartcook)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).SendString("Error Unmarshalling")
+			}
+
+			ret = fmt.Sprint(ret + "\nValor do cookie Cart: " + current)
+		}
+
+		return c.Status(fiber.StatusOK).SendString(ret)
 	})
 
 }
@@ -77,25 +121,23 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	app.Get("/pedidos", func(c*fiber.Ctx)error {
-    cl := c.Cookies("client")
-    client,err := processlogin(cl)
-    if err != nil{
-        c.Status(fiber.StatusBadRequest).SendString("Cliente não conectado")
-    }
-    pedidos, err:= db.GetClientPurchases(client.Id)
+	app.Get("/pedidos", func(c *fiber.Ctx) error {
+		cl := c.Cookies("client")
+		client, err := processlogin(cl)
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString("Cliente não conectado")
+		}
+		pedidos, err := db.GetClientPurchases(client.Id)
 
-    if err != nil{
-        c.Status(fiber.StatusBadRequest).SendString(err.Error())
-    }
-    return c.JSON(pedidos)
-  })
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		return c.JSON(pedidos)
+	})
 
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
 	})
-<<<<<<< Updated upstream
-=======
 	app.Get("/purchase", func(c *fiber.Ctx) error {
 		clientcookie := c.Cookies("client")
 		cartcookie := c.Cookies("cart")
@@ -157,7 +199,6 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		return c.Status(fiber.StatusOK).SendString(fmt.Sprintf("Compra realizada corretamente, ID: ", id))
 	})
 
-
 	app.Get("/addplant/:id/:ammount/:price", func(c *fiber.Ctx) error {
 
 		id, err := c.ParamsInt("id")
@@ -192,7 +233,10 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			cookie.Expires = time.Now().Add(3 * time.Hour)
 			cookie.HTTPOnly = false
 			c.Cookie(cookie)
-			return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
+			return c.Render("cart", fiber.Map{
+				"Title": "Carrinho":cookie.Value,
+				"Cookies": cartcontent,
+			})
 		}
 		cart := new(cartcookie)
 		err = json.Unmarshal([]byte(cartcontent), cart)
@@ -225,11 +269,13 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		cookie.HTTPOnly = false
 		c.Cookie(cookie)
 
-		return c.Status(fiber.StatusOK).SendString("Succesfully put it in the cart")
+		return c.Render("cart", fiber.Map{
+			"Title": "Carrinho": cookie.Value,
+			"cartcookie": cart,
+		})
 
 	},
 	)
->>>>>>> Stashed changes
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
 		client := new(database.Client)
@@ -257,8 +303,6 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	app.Get("/login/vendor", func(c *fiber.Ctx) error {
 		return c.Render("loginVendor", fiber.Map{}) // Serve o arquivo HTML
 	})
-<<<<<<< Updated upstream
-=======
 	app.Get("/login/client", func(c *fiber.Ctx) error {
 		return c.Render("loginClient", fiber.Map{}) // Serve o arquivo HTML
 	})
@@ -299,7 +343,6 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		return c.SendString(fmt.Sprintf("Login feito corretamente para cliente de nome: %s", name))
 
 	})
->>>>>>> Stashed changes
 	app.Post("/login/vendor", func(c *fiber.Ctx) error {
 		login := new(login)
 		if err := c.BodyParser(login); err != nil {
@@ -307,17 +350,31 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		}
 		fmt.Println(login.Email)
 		fmt.Println(login.Password)
-		id, psw, err := db.GetLogin("vendor", login.Email)
+		id, name, psw, err := db.GetLogin("vendor", login.Email)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 
+		}
+		clientcookie := logincookie{
+			Id:   id,
+			Name: name,
+		}
+		value, err := json.Marshal(clientcookie)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Error marshaling json")
 		}
 
 		if err = auth.CheckPassword([]byte(psw), []byte(login.Password)); err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString("Wrong password")
 
 		}
-		return c.SendString(fmt.Sprintf("ID: %d", id))
+		log.Println(login.Email + " se conectou")
+		cookie := new(fiber.Cookie)
+		cookie.Name = "vendor"
+		cookie.Value = string(value)
+		cookie.Expires = time.Now().Add(3 * time.Hour)
+		c.Cookie(cookie)
+		return c.SendString(fmt.Sprintf("Login feito corretamente para vendedor de nome: %s", name))
 
 	})
 	app.Post("/signup/vendor", func(c *fiber.Ctx) error {
@@ -336,13 +393,19 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		password, err := auth.HashPassword(client.Password)
 		_, err = db.Create(query, client.Name, client.Email, password, client.CPF, client.Rua, client.Num)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create vendoir: %v", err))
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create vendor: %v", err))
 		}
 
 		return c.SendString("Vendor created successfully")
 
 	},
 	)
+	app.Get("/logout", func(c *fiber.Ctx) error {
+
+		c.ClearCookie()
+
+		return c.SendString("Todos os cookies foram deletados!")
+	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
@@ -351,44 +414,27 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	})
 
 	app.Get("/plants/all", func(c *fiber.Ctx) error {
-		// Obtém a lista de plantas do banco de dados
 		plants, err := db.GetProducts()
 		if err != nil {
 			return err
 		}
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-		return c.Render("view-plants", fiber.Map{
-=======
 		return c.Render("view-plants",fiber.Map{
->>>>>>> Stashed changes
 			"Title":  "Todas as plantas a venda",
-=======
-	
-		// Renderiza a página HTML com os dados das plantas
-		return c.Render("view-plants", fiber.Map{
-			"Title":  "Todas as plantas à venda",
->>>>>>> Stashed changes
 			"Plants": plants,
 		})
 	})
-	
 	app.Get("/plants/mari", func(c *fiber.Ctx) error {
 		plants, err := db.GetProductsFromMari()
 		if err != nil {
 			return err
 		}
-		return c.Render("view-plants", fiber.Map{
+		return c.Render("view-plants",fiber.Map{
 			"Title":  "Todas as plantas a venda de mari (Imperdiveis)",
 			"Plants": plants,
 		})
 	})
 
 	app.Get("/plants/category/", func(c *fiber.Ctx) error {
-		if c.Query("category") == "all" {
-			app.Get("/plants/all", func(c *fiber.Ctx))
-		}
-		else{
 		category := c.Query("category")
 		plants, err := db.GetProductsByCategory(category)
 
@@ -396,13 +442,8 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err,
 			})
-<<<<<<< Updated upstream
 		}
-		return c.Render("view-plants", fiber.Map{
-=======
-		}}
 		return c.Render("view-plants",fiber.Map{
->>>>>>> Stashed changes
 			"Title":  "Todas as plantas da categoria " + category,
 			"Plants": plants,
 		})
@@ -428,50 +469,25 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-<<<<<<< Updated upstream
-		return c.Render("view-plants", fiber.Map{
-=======
 		return c.Render("view-plants",fiber.Map{
->>>>>>> Stashed changes
 			"Title":  "Todas as plantas de valor abaixo de " + max,
 			"Plants": plants,
 		})
 	})
-
 	// Rota que pega o nome diretamente no caminho
 	app.Get("/plant/name/:name", func(c *fiber.Ctx) error {
-<<<<<<< Updated upstream
-		plantName := c.Params("name")
-		
-		// Buscar a planta pelo nome
-		plant, err := db.GetPlantByName(plantName) // Supondo que exista essa função no seu banco
-=======
-		// Obtém o nome da planta a partir da URL
 		name := c.Params("name")
 		name = strings.NewReplacer("%20", " ").Replace(name)
-	
-		// Chama a função do seu banco de dados para obter os detalhes da planta
 		plant, err := db.GetProductByName(name)
-	
->>>>>>> Stashed changes
+
 		if err != nil {
-			return err
+			if err.Error() == fmt.Sprintf("Nenhuma planta encontrada com o nome; %s", name) {
+				return c.Status(fiber.StatusNotFound).SendString("Couldn't find plant named: " + name)
+			}
+			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")
 		}
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
-		return c.Render("view-full-plant", fiber.Map{
-			"Title": "Planta: " + name,
-=======
-		
-		return c.Render("view-full-plant", fiber.Map{
->>>>>>> Stashed changes
-=======
-	
-		// Renderiza a página de detalhes da planta
-		return c.Render("views/view-full-plant.html", fiber.Map{
-
->>>>>>> Stashed changes
+		return c.Render("view-full-plant",fiber.Map{
 			"Plant": plant,
 		})
 	})
