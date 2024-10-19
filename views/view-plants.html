@@ -4,24 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50; /* Verde escuro */
+        }
+        .container {
+            display: flex;
+
+            flex-wrap: wrap; /* Permite que os itens se reorganizem em múltiplas linhas */
+            flex-wrap: wrap; /* Itens se reorganizam em múltiplas linhas */
+            gap: 20px; /* Espaçamento entre os itens */
+            justify-content: space-around; /* Distribui os itens de forma equilibrada */
+        }
+
+        .plant-item {
+
+            display: block; /* Permite que o link ocupe todo o espaço */
+            width: 200px; /* Tamanho menor do card da planta */
+            display: block;
+            width: 200px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave no hover */
+            text-decoration: none; /* Remove sublinhado do link */
+            color: inherit; /* Herda a cor do texto sem o azul padrão */
+        }
+
+        .plant-item:hover {
+            transform: scale(1.05); /* Aumenta levemente o tamanho ao passar o mouse */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra mais intensa no hover */
+            cursor: pointer; /* Altera o cursor para mão */
+        }
+
+        .plant-item img {
+            width: 100%; /* Assegura que a imagem ocupe toda a largura do card */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit; /* Herda a cor do texto */
+        }
+
+        .plant-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .plant-item img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .plant-item h2 {
+            font-size: 18px;
+            margin: 10px 0 5px 0;
+        }
+
+        .plant-item p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .plant-item a:hover {
+            color: #4CAF50; /* Cor verde para indicar interatividade no hover */
+            text-decoration: underline; /* Adiciona sublinhado no hover, se desejado */
+        }
+
+        .filter-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-form label {
+            margin-right: 10px;
+        }
+        .filter-form select {
+            padding: 5px;
+            font-size: 1em;
+        }
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        a.back {
+            display: inline-block;
+            margin: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a.back:hover {
+            text-decoration: underline;
+        }
+    </style>
+
 </head>
 <body>
+    <a href="/" class="back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar
+    </a>
     <h1>{{.Title}}</h1>
-    <ul>
-    {{range .Plants}}
-        <li>
+
+    <!-- Filtro de plantas por categoria e preço -->
+    <div class="filter-form">
+        <form action="/plants/category" method="GET">
+            <label for="options">Escolha uma categoria:</label>
+            <select id="options" name="category">
+                <option value="all">Todas</option>
+                <option value="flores">Flores</option>
+                <option value="plantas">Plantas</option>
+                <option value="arvores">Árvores</option>
+                <option value="suculentas">Suculentas</option>
+            </select>
+            <button type="submit" class="filter-button">Pesquisar</button>
+</form>       
+
+        <div>
+            <h2>Pesquisar por Valor Máximo</h2>
+            <form action="/plants/price" method="GET">
+                    <input type="number" name="max" placeholder="Preço">
+    
+                <button type="submit" class="filter-button">Pesquisar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de produtos -->
+    <div class="container">
+        {{range .Plants}}
+        <a href="/plant/name/{{.Name}}" class="plant-item">
+            <img src="{{.ImageURL}}" alt="{{.Name}}">
             <h2>{{.Name}}</h2>
-            <p><strong>Nome Científico:</strong> {{.ScientificName}}</p>
-            <p><strong>Categoria:</strong> {{.Category}}</p>
             <p><strong>Preço:</strong> R$ {{.Price}}</p>
-            <p><strong>URL da Imagem:</strong> <img src="{{.ImageURL}}" alt="{{.Name}}" width="200"></p>
-            <a href="/plant/name/{{.Name}}">Ver Detalhes</a>
-        </li>
-    {{else}}
-        <li>No plants found.</li>
-    {{end}}
-    </ul>
-    <a href="/">Voltar para a Página Inicial</a>
+            <p><strong>Categoria:</strong> {{.Category}}</p>
+        </a>
+        {{else}}
+            <p>No plants found.</p>
+        {{end}}
+    </div>           
+
 </body>
 </html>
-

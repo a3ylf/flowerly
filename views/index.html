@@ -1,49 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial</title>
+    <title>Floricultura APM</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
+    color: #563808;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+}
+
+h1 {
+    font-weight: 500;
+    font-size: 2.8rem;
+    color: #563808;
+    margin-top: 30px;
+    text-align: center;
+}
+
+nav {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #78D75B;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav ul li {
+    position: relative;
+    margin: 0 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+nav ul li:hover > a {
+    background-color: #F35BAF;
+    border-radius: 5px;
+}
+
+nav ul li ul {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: 150%;
+    left: 0;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    min-width: 180px;
+    z-index: 10;
+}
+
+nav ul li:hover ul,
+nav ul li ul:hover {
+    display: block;
+}
+
+nav ul li ul li {
+    position: relative;
+}
+
+nav ul li ul li a {
+    color: #78D75B;
+    padding: 10px 20px;
+    display: block;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+nav ul li ul li a:hover {
+    background-color: #f0f0f0;
+}
+
+.hero {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.hero img {
+    margin-top: 30px;
+    height: auto;
+    max-width: 40%;
+    border-radius: 100px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.hero img:hover {
+    transform: scale(1.05);
+}
+
+footer {
+    width: 100%;
+    margin-top: 50px;
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    padding: 20px 0;
+}
+
+footer p {
+    margin: 5px 0;
+    color: #563808;
+}
+
+footer a {
+    color: #78D75B;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
-    <h1>Página Inicial</h1>
 
-    <!-- Link para visualizar todas as plantas -->
-    <div>
-          <a href="view-plants.html">Ver todas as plantas</a>
+    <h1>Floricultura APM</h1>
+
+    <nav>
+        <ul>
+            <li><a href="/">Início</a></li>
+            <li><a href="/plants/all">Produtos</a></li>
+            <li class="dropC">
+                <a href="#">Perfil</a>
+                <ul>
+                    <li><a href="login/client">Login Cliente</a></li>
+                    <li><a href="login/vendor">Login Funcionário</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="hero">
+        <a href="/plants/all">
+            <img src="images/Flowerly_img.svg" alt="Floricultura Logo">
+        </a>
     </div>
 
-    <!-- Formulário para pesquisar por categoria -->
-    <div>
-        <h2>Pesquisar por Categoria</h2>
-        <form action="/plants/category" method="GET">
-            <label for="category">Escolha uma categoria:</label>
-            <select id="category" name="category">
-                <option value="flores">Flores</option>
-                <option value="plantas">Plantas</option>
-                <option value="suculentas">Suculentas</option>
-                <option value="arvores">Árvores</option>
-            </select>
-            <button type="submit">Pesquisar</button>
-        </form>
-    </div>
+    <footer>
+        <p>&copy; 2024 Floricultura APM - Todos os direitos reservados.</p>
+        <p>Desenvolvido como projeto final da disciplina de Banco de Dados</p>
+    </footer>
 
-    <div>
-        <h2>Pesquisar por Valor Máximo</h2>
-        <form action="/plants/price" method="GET">
-                <input type="number" name="max" placeholder="Preço">
-
-            <button type="submit">Pesquisar</button>
-        </form>
-    </div>
-
-    <div>
-        <h2>Veja as nossos incriveis produtos de mari</h2>
-            <a href="/plants/mari">
-                <button type="submit">Pesquisar</button>
-            </a>
-    </div>
 </body>
+
 </html>
-
-

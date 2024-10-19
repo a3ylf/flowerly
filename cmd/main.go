@@ -400,12 +400,12 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 		return c.SendString("Todos os cookies foram deletados!")
 	})
-
+/*
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
-			"Title": "FLOWERLY",
 		})
 	})
+	*/
 
 	app.Get("/plants/all", func(c *fiber.Ctx) error {
 		plants, err := db.GetProducts()

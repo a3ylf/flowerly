@@ -3,20 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Login Funcionário</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #563808;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        form {
+            background-color: #F4F2D5;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 12px 0 5px;
+            font-size: 1rem;
+            color: #563808;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #78D75B;
+        }
+
+        input[type="submit"],
+        .CadastraButton {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        input[type="submit"] {
+            background-color: #F35BAF; /* Rosa para o botão de login */
+        }
+
+        input[type="submit"]:hover {
+            background-color: #D42E8E; /* Rosa mais escuro ao passar o mouse */
+            transform: scale(1.03);
+        }
+
+        .CadastraButton {
+            background-color: #78D75B; /* Verde claro para o botão de cadastrar */
+        }
+
+        .CadastraButton:hover {
+            background-color: #5BB546; /* Verde mais escuro ao passar o mouse */
+            transform: scale(1.03);
+        }
+
+        footer {
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: #78D75B;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back {
+            position: fixed; 
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            color: #563808;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .back:hover{
+            color: #D42E8E;
+        }
+
+        .back svg {
+            margin-right: 5px;
+        }
+        
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+    <script>
+        $(document).ready(function() {
+            $(".CadastraButton").click(function() {
+     window.location.href = "signup/vendor"; 
+
+            });
+        });
+    </script>
 </head>
 <body>
-    <h1>Login as vendor</h1>
+
+
+    <a href="/" class="back">
+
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar
+    </a>
+
+    <h1>Login Vendedor</h1>
     <form action="/login/vendor" method="post">
-                <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
+        <input type="password" id="password" name="password" required>
 
-       
-        <input type="submit" value="login">
+        <input type="submit" value="Login">
+        
+        <button type="button" class="CadastraButton">Cadastrar</button> 
     </form>
 </body>
 </html>
-
