@@ -121,19 +121,19 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	app.Get("/pedidos", func(c*fiber.Ctx)error {
-    cl := c.Cookies("client")
-    client,err := processlogin(cl)
-    if err != nil{
-        c.Status(fiber.StatusBadRequest).SendString("Cliente não conectado")
-    }
-    pedidos, err:= db.GetClientPurchases(client.Id)
+	app.Get("/pedidos", func(c *fiber.Ctx) error {
+		cl := c.Cookies("client")
+		client, err := processlogin(cl)
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString("Cliente não conectado")
+		}
+		pedidos, err := db.GetClientPurchases(client.Id)
 
-    if err != nil{
-        c.Status(fiber.StatusBadRequest).SendString(err.Error())
-    }
-    return c.JSON(pedidos)
-  })
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		return c.JSON(pedidos)
+	})
 
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
@@ -198,7 +198,6 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 		return c.Status(fiber.StatusOK).SendString(fmt.Sprintf("Compra realizada corretamente, ID: ", id))
 	})
-
 
 	app.Get("/addplant/:id/:ammount/:price", func(c *fiber.Ctx) error {
 
@@ -483,7 +482,6 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		}
 
 		return c.JSON(fiber.Map{
-			"Title": "Planta: " + name,
 			"Plant": plant,
 		})
 	})

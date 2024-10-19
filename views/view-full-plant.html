@@ -3,19 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
+    <title>Plant Details</title>
+    <script>
+        async function fetchPlantData(plantName) {
+            try {
+                const response = await fetch(`/plant/name/${plantName}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch plant data');
+                }
+                const data = await response.json();
+                const plant = data.Plant; // Agora acessa a propriedade 'Plant'
+
+                document.getElementById('plant-name').textContent = plant.name;
+                document.getElementById('scientific-name').textContent = plant.scientific_name;
+                document.getElementById('description').textContent = plant.description;
+                document.getElementById('category').textContent = plant.category;
+                document.getElementById('price').textContent = `R$ ${plant.price}`;
+                document.getElementById('stock-quantity').textContent = plant.stock_quantity;
+                document.getElementById('image').src = plant.image_url;
+                document.getElementById('origin-location').textContent = plant.origin_location;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const plantName = urlParams.get('name');
+            if (plantName) {
+                fetchPlantData(plantName);
+            }
+        });
+    </script>
 </head>
 <body>
-    <h1>{{.Title}}</h1>
+    <h1>Plant Details</h1>
     
-    <h2>{{.Plant.Name}}</h2>
-    <p><strong>Nome Científico:</strong> {{.Plant.ScientificName}}</p>
-    <p><strong>Descrição:</strong> {{.Plant.Description}}</p>
-    <p><strong>Categoria:</strong> {{.Plant.Category}}</p>
-    <p><strong>Preço:</strong> R$ {{.Plant.Price}}</p>
-    <p><strong>Quantidade em Estoque:</strong> {{.Plant.StockQuantity}}</p>
-    <p><strong>URL da Imagem:</strong> <img src="{{.Plant.ImageURL}}" alt="{{.Plant.Name}}" width="200"></p>
-    <p><strong>Local de Origem:</strong> {{.Plant.OriginLocation}}</p>
+    <h2 id="plant-name"></h2>
+    <p><strong>Nome Científico:</strong> <span id="scientific-name"></span></p>
+    <p><strong>Descrição:</strong> <span id="description"></span></p>
+    <p><strong>Categoria:</strong> <span id="category"></span></p>
+    <p><strong>Preço:</strong> <span id="price"></span></p>
+    <p><strong>Quantidade em Estoque:</strong> <span id="stock-quantity"></span></p>
+    <p><strong>Imagem:</strong> <img id="image" alt="Plant Image" width="200"></p>
+    <p><strong>Local de Origem:</strong> <span id="origin-location"></span></p>
     
     <a href="/">Voltar para a Página Inicial</a>
 </body>
