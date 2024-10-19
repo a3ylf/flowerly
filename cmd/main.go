@@ -414,7 +414,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.JSON(fiber.Map{
+		return c.Render("view-plants",fiber.Map{
 			"Title":  "Todas as plantas a venda",
 			"Plants": plants,
 		})
@@ -424,7 +424,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.JSON(fiber.Map{
+		return c.Render("view-plants",fiber.Map{
 			"Title":  "Todas as plantas a venda de mari (Imperdiveis)",
 			"Plants": plants,
 		})
@@ -439,7 +439,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.JSON(fiber.Map{
+		return c.Render("view-plants",fiber.Map{
 			"Title":  "Todas as plantas da categoria " + category,
 			"Plants": plants,
 		})
@@ -465,8 +465,8 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.JSON(fiber.Map{
-			"Title":  "Todas as plantas de valor abaixo de " + max,
+		return c.Render("view-plants",fiber.Map{
+			"Title":  "Todas as plantas de valor abaixo de " + max + " reais",
 			"Plants": plants,
 		})
 	})
@@ -483,7 +483,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")
 		}
 
-		return c.JSON(fiber.Map{
+		return c.Render("view-full-plant",fiber.Map{
 			"Plant": plant,
 		})
 	})
