@@ -233,7 +233,10 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			cookie.Expires = time.Now().Add(3 * time.Hour)
 			cookie.HTTPOnly = false
 			c.Cookie(cookie)
-			return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
+			return c.Render("cart", fiber.Map{
+				"Title": "Carrinho":cookie.Value,
+				"Cookies": cartcontent,
+			})
 		}
 		cart := new(cartcookie)
 		err = json.Unmarshal([]byte(cartcontent), cart)
@@ -266,10 +269,15 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		cookie.HTTPOnly = false
 		c.Cookie(cookie)
 
-		return c.Status(fiber.StatusOK).SendString("Succesfully put it in the cart")
+		return c.Render("cart", fiber.Map{
+			"Title": "Carrinho": cookie.Value,
+			"cartcookie": cart,
+		})
 
 	},
 	)
+
+	
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
 		client := new(database.Client)

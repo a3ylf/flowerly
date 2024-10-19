@@ -14,18 +14,28 @@
                 const data = await response.json();
                 const plant = data.Plant; // Agora acessa a propriedade 'Plant'
 
-                document.getElementById('plant-name').textContent = plant.name;
-                document.getElementById('scientific-name').textContent = plant.scientific_name;
-                document.getElementById('description').textContent = plant.description;
-                document.getElementById('category').textContent = plant.category;
-                document.getElementById('price').textContent = `R$ ${plant.price}`;
-                document.getElementById('stock-quantity').textContent = plant.stock_quantity;
-                document.getElementById('image').src = plant.image_url;
-                document.getElementById('origin-location').textContent = plant.origin_location;
-            } catch (error) {
-                console.error(error);
+            if (quantity > 0) {
+                // Redireciona para a rota addplant com o ID da planta e a quantidade
+                window.location.href = `/addplant/${plantId}/${quantity}/${plantPrice}`;
+                alert("Planta adicionada ao carrinho!");
+               let result=  confirm("Deseja continuar comprando?");
+                if (result) {
+                    window.location.href = "/plants/all";
+                }
+                else{
+                    paymentMethod = prompt("Digite o método de pagamento: ");
+                    window.location.href = `/purchase?payment=${paymentMethod}`;
+                }
+            } else {
+            
+                alert("Por favor, insira uma quantidade válida.");
+
             }
-        }
+        }catch (error) {
+            console.error(error);
+            alert('Erro ao buscar dados da planta');
+        }}
+        
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
