@@ -58,7 +58,18 @@ func processlogin(log string) (*logincookie, error) {
 }
 
 func setupTestRoutes(app *fiber.App, db *database.Database) {
+	app.Get("vendor/relatorio", func(c *fiber.Ctx) error {
+		// Suponha que você já tenha um objeto `db` do tipo *database
+		report, err := db.GenerateMonthlySalesReport()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Error generating report")
+		}
 
+		// Renderiza o template passando o relatório
+		return c.Render("vendorRelatorios", fiber.Map{
+			"report": report,
+		})
+	})
 	app.Get("/clients", func(c *fiber.Ctx) error {
 		clients, err := db.GetClients()
 		if err != nil {
@@ -133,7 +144,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		})
 
 	})
-app.Get("profile/vendor", func(c *fiber.Ctx) error {
+	app.Get("profile/vendor", func(c *fiber.Ctx) error {
 		a := c.Cookies("client")
 		login, _ := processlogin(a)
 		cli, err := db.GetVendor(login.Id)
@@ -143,7 +154,7 @@ app.Get("profile/vendor", func(c *fiber.Ctx) error {
 		return c.Render("profileVendor", fiber.Map{
 			"client": cli,
 		})
-  })
+	})
 	app.Get("profile/ending", func(c *fiber.Ctx) error {
 		a := c.Cookies("vendor")
 		login, _ := processlogin(a)
@@ -193,6 +204,14 @@ app.Get("profile/vendor", func(c *fiber.Ctx) error {
 
 	app.Get("/signup/client", func(c *fiber.Ctx) error {
 		return c.Render("signupClient", fiber.Map{}) // Serve o arquivo HTML
+	})
+	app.Get("/signup/vendor", func(c *fiber.Ctx) error {
+		a := c.Cookies("vendor")
+		if a == "" {
+			return c.Redirect("/login/vendor")
+		}
+
+		return c.Render("signupVendor", fiber.Map{}) // Serve o arquivo HTML
 	})
 	app.Get("/purchase", func(c *fiber.Ctx) error {
 		clientcookie := c.Cookies("client")
@@ -374,7 +393,7 @@ app.Get("profile/vendor", func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).SendString("Failed to update purchase: " + err.Error())
 		}
 
-		return c.Redirect("/profile")	
+		return c.Redirect("/profile")
 	})
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
@@ -487,7 +506,7 @@ app.Get("profile/vendor", func(c *fiber.Ctx) error {
 		cookie.Value = string(value)
 		cookie.Expires = time.Now().Add(3 * time.Hour)
 		c.Cookie(cookie)
-	
+
 		return c.Redirect("/profile")
 	})
 	app.Post("/signup/vendor", func(c *fiber.Ctx) error {

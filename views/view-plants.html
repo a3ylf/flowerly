@@ -127,6 +127,7 @@
     <h1>{{.Title}}</h1>
 
     <!-- Filtro de plantas por categoria e preço -->
+    <div class="container">
     <div class="filter-form">
         <form action="/plants/category" method="GET">
             <label for="options">Escolha uma categoria:</label>
@@ -138,17 +139,21 @@
                 <option value="suculentas">Suculentas</option>
             </select>
             <button type="submit" class="filter-button">Pesquisar</button>
-</form>       
-
-        <div>
-            <h2>Pesquisar por Valor Máximo</h2>
-            <form action="/plants/price" method="GET">
-                    <input type="number" name="max" placeholder="Preço">
-    
-                <button type="submit" class="filter-button">Pesquisar</button>
-            </form>
-        </div>
+        </form>       
     </div>
+
+    <div class="price-form">
+        <label for="options">Pesquisar por Valor</label>
+        <form action="/plants/price" method="GET">
+            <input type="number" name="max" placeholder="Preço">
+            <button type="submit" class="filter-button">Pesquisar</button>
+        </form>
+    </div>
+
+    <div class="plant-container">
+        <button onclick="window.location.href='/plants/mari'">Mari</button>
+    </div>
+</div>
 
     <!-- Lista de produtos -->
     <div class="container">

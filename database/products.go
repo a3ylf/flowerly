@@ -3,8 +3,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"strings"
+	"time"
+
+	_ "github.com/lib/pq"
 )
 
 func (db *Database) GetProducts() ([]Plant, error) {
@@ -206,5 +208,53 @@ func (db *Database) GetClientPurchases(clientID int) (*ClientPurchases, error) {
 
 	return &clientPurchases, nil
 }
+func (db *Database) GenerateMonthlySalesReport() (string, error) {
+    query := `
+        SELECT 
+            vendor_id, 
+            DATE_TRUNC('month', purchase_date) AS month, 
+            COUNT(*) AS total_purchases, 
+            SUM(total_amount) AS total_sales
+        FROM 
+            purchase
+        WHERE 
+            payment_status = 'Compra completa'
+        GROUP BY 
+            vendor_id, DATE_TRUNC('month', purchase_date)
+        ORDER BY 
+            month DESC, vendor_id;
+    `
+
+    rows, err := db.Db.Query(query)
+    if err != nil {
+        return "", err
+    }
+    defer rows.Close()
+
+    var report string
+    for rows.Next() {
+        var vendorID int
+        var month time.Time
+        var totalPurchases int
+        var totalSales float64
+
+        // Escaneando o resultado da query
+        if err := rows.Scan(&vendorID, &month, &totalPurchases, &totalSales); err != nil {
+            return "", err
+        }
+
+        // Formata o relatório incluindo o número de compras e o total de vendas
+        report += fmt.Sprintf(
+            "\nVendor %d | Month: %s | Total Purchases: %d | Total Sales: %.2f\n", 
+            vendorID, 
+            month.Format("January/2006"), 
+            totalPurchases, 
+            totalSales,
+        )
+    }
+
+    return report, nil
+}
+
 
 

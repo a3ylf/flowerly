@@ -18,12 +18,12 @@ VALUES
 ('Bromelia', 'Bromelia laciniosa', 'Planta tropical resistente, comum em regioes aridas.', 'plantas', 18.50, 85, 'bromelia.png', 'Campina Grande'),
 ('Hibisco', 'Hibiscus rosa-sinensis', 'Flores vibrantes usadas em paisagismo e chas.', 'flores', 7.99, 200, 'hibisco.png', 'Joao Pessoa'),
 ('Cacto Mandacaru', 'Cereus jamacaru', 'Cacto tipico do semiarido nordestino.', 'suculentas', 12.00, 100, 'mandacaru.png', 'Patos'),
-('Palmeira Imperial', 'Roystonea oleracea', 'Palmeira de grande porte, muito usada em jardins.', 'arvores', 120.00, 15, 'palmeira_imperial.png', 'Areia'),
+('Palmeira Imperial', 'Roystonea oleracea', 'Palmeira de grande porte, muito usada em jardins.', 'arvores', 120.00, 4, 'palmeira_imperial.png', 'Areia'),
 ('Jiboia', 'Epipremnum aureum', 'Planta trepadeira muito popular em interiores.', 'plantas', 10.99, 75, 'jiboia.png', 'Cajazeiras'),
 ('Samambaia', 'Nephrolepis exaltata', 'Planta ornamental muito utilizada em varandas.', 'plantas', 14.50, 95, 'samambaia.png', 'Mari'),
 ('Ipe Amarelo', 'Handroanthus albus', 'Arvore ornamental com flores amarelas vibrantes.', 'arvores', 85.00, 40, 'ipe_amarelo.png', 'Areia'),
 ('Cafe', 'Coffea arabica', 'Planta cultivada para a producao de cafe.', 'arvores', 30.00, 120, 'cafe.png', 'Brejo da Paraiba'),
-('Flor de Maio', 'Schlumbergera truncata', 'Planta suculenta com flores coloridas.', 'suculentas', 15.00, 60, 'flor_de_maio.png', 'Mari'),
+('Flor de Maio', 'Schlumbergera truncata', 'Planta suculenta com flores coloridas.', 'suculentas', 15.00, 2, 'flor_de_maio.png', 'Mari'),
 ('Maranta', 'Maranta leuconeura', 'Planta de folhas ornamentais, tambem conhecida como planta rezadeira.', 'plantas', 20.00, 50, 'maranta.png', 'Guarabira'),
 ('Costela de Adao', 'Monstera deliciosa', 'Planta de folhas grandes e recortadas, muito usada em decoracao.', 'plantas', 35.00, 40, 'costela_de_adao.png', 'Campina Grande'),
 ('Violeta', 'Saintpaulia ionantha', 'Planta de pequenas flores, popular em interiores.', 'flores', 8.50, 180, 'violeta.png', 'Alagoa Grande'),
@@ -48,7 +48,11 @@ CREATE TABLE client (
 );
 
 INSERT INTO client (name, email, password, cpf,rua,num)
-VALUES ('client', 'client@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901','bruno almeida', 122);
+VALUES 
+  ('client', 'client@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901','bruno almeida', 122),
+    ('Alice', 'alice@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678902', 'Rua das Flores', 45),
+    ('Bob', 'bob@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678903', 'Avenida Brasil', 78),
+    ('Charlie', 'charlie@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678904', 'Rua da Paz', 33);
 
 CREATE TABLE vendor (
     id SERIAL PRIMARY KEY,
@@ -58,7 +62,11 @@ CREATE TABLE vendor (
     cpf varchar(11) unique not null
 );
 INSERT INTO vendor (name, email, password, cpf)
-VALUES ('Admin', 'admin@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901');
+VALUES
+  ('Admin', 'admin@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678901'),
+  ('Vendor One', 'vendor1@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678905'),
+    ('Vendor Two', 'vendor2@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678906'),
+    ('Vendor Three', 'vendor3@example.com', '$2a$10$w9HUkNydSBqJnUOngDrLN..O5yZVHM/D9wXlEHhlV7fpM6SQVZXNS', '12345678907');
 
 create table cart (
     id serial primary key,
@@ -72,13 +80,17 @@ create table cart_item (
     primary key (cart_id, product_id)
 );
 INSERT INTO cart (client_id)
-VALUES (1);
-INSERT INTO cart (client_id)
-VALUES (1);
-INSERT INTO cart_item (cart_id,product_id,quantity)
-VALUES (1,3,4);
-INSERT INTO cart_item (cart_id,product_id,quantity)
-VALUES (1,2,5);
+VALUES 
+    (1), -- Referenciando o cliente 'Alice'
+    (2), -- Referenciando o cliente 'Bob'
+    (3); -- Referenciando o cliente 'Charlie'
+
+INSERT INTO cart_item (cart_id, product_id, quantity)
+VALUES 
+    (1, 1, 2), -- Adicionando 2 unidades do produto com ID 1 ao carrinho de 'Alice'
+    (1, 2, 1), -- Adicionando 1 unidade do produto com ID 2 ao carrinho de 'Alice'
+    (2, 3, 3); -- Adicionando 3 unidades do produto com ID 3 ao carrinho de 'Bob'
+
 
 CREATE TABLE purchase (
     id SERIAL PRIMARY KEY,
@@ -90,7 +102,14 @@ CREATE TABLE purchase (
     vendor_id INT NULL,
   FOREIGN KEY(vendor_id) REFERENCES vendor(id)
 );
+INSERT INTO purchase (cart_id, total_amount, payment_status, payment_method, vendor_id)
+VALUES 
+    (1, 150.00, 'Compra completa', 'crédito', 1), -- Compra de 'Alice'
+    (3, 200.00, 'Compra completa', 'pix', 3); -- Compra de 'Charlie'
 
+INSERT INTO purchase (cart_id, total_amount, payment_status, payment_method)
+VALUES 
+    (2, 75.50, 'esperando efetivação', 'boleto'); -- Compra de 'Bob'
 
 ALTER TABLE purchase ADD CONSTRAINT fk_cart
 FOREIGN KEY (cart_id) REFERENCES cart(id);
@@ -98,6 +117,10 @@ FOREIGN KEY (cart_id) REFERENCES cart(id);
 ALTER TABLE cart_item ADD CONSTRAINT fk_product
 FOREIGN KEY (product_id) REFERENCES plants(id);
 
+CREATE TABLE monthly_sales_report (
+    id SERIAL PRIMARY KEY,
+    generated_at DATE NOT NULL,
+    report_content TEXT );
 
 
 
