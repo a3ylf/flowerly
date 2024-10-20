@@ -1,0 +1,217 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floricultura APM - Perfil</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
+            color: #563808;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%;
+        }
+
+        h1 {
+            font-weight: 500;
+            font-size: 2.8rem;
+            color: #563808;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        nav {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1200px;
+            background-color: #78D75B;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav ul li {
+            position: relative;
+            margin: 0 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        nav ul li:hover > a {
+            background-color: #F35BAF;
+            border-radius: 5px;
+        }
+
+        .profile {
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .orders {
+            margin-top: 20px;
+        }
+
+        .order {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .order h3 {
+            margin-bottom: 10px;
+        }
+
+        .products {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .products li {
+            padding: 5px 0;
+        }
+
+        footer {
+            width: 100%;
+            margin-top: 50px;
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            padding: 20px 0;
+        }
+
+        footer p {
+            margin: 5px 0;
+            color: #563808;
+        }
+
+        footer a {
+            color: #78D75B;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        // Fetch para obter os pedidos
+        fetch('/pedidos')
+            .then(response => response.json())
+            .then(data => {
+                const ordersDiv = $('#orders');
+
+                data.purchases.forEach(purchase => {
+                    let orderHTML;
+
+                    if (purchase.payment_method === "berries") {
+                        orderHTML = `
+                            <div class="order">
+                                <h3>Pedido #${purchase.purchase_id}</h3>
+                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
+                                <p>Total: ${purchase.total_amount} berries</p>
+                                <p>Status: ${purchase.payment_status}</p>
+                                <p>Método de Pagamento: ${purchase.payment_method}</p>
+                                <h4>Produtos:</h4>
+                                <ul class="products">
+                                    ${purchase.products.map(product => `
+                                        <li>${product.quantity}x ${product.product_name}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        orderHTML = `
+                            <div class="order">
+                                <h3>Pedido #${purchase.purchase_id}</h3>
+                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
+                                <p>Total: R$ ${(purchase.total_amount / 100).toFixed(2)}</p>
+                                <p>Status: ${purchase.payment_status}</p>
+                                <p>Método de Pagamento: ${purchase.payment_method}</p>
+                                <h4>Produtos:</h4>
+                                <ul class="products">
+                                    ${purchase.products.map(product => `
+                                        <li>${product.quantity}x ${product.product_name}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    ordersDiv.append(orderHTML);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar pedidos:', error);
+            });
+    });
+</script>
+
+</head>
+
+<body>
+
+    <h1>Floricultura APM - Perfil do Cliente</h1>
+
+    <nav>
+        <ul>
+            <li><a href="/">Início</a></li>
+            <li><a href="/plants/all">Produtos</a></li>
+            <li class="dropC">
+                <a href="/profile/dados/client">dados</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="profile">
+        <h2>Seus Pedidos</h2>
+        <div id="orders" class="orders"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Floricultura APM - Todos os direitos reservados.</p>
+        <p>Desenvolvido como projeto final da disciplina de Banco de Dados</p>
+    </footer>
+
+</body>
+</html>

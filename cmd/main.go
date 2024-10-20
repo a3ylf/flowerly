@@ -121,6 +121,39 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+	app.Get("profile/client", func(c *fiber.Ctx) error {
+		a := c.Cookies("client")
+		login, _ := processlogin(a)
+		cli, err := db.GetClient(login.Id)
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString("ID invalido: " + err.Error())
+		}
+		return c.Render("profileClient", fiber.Map{
+			"client": cli,
+		})
+
+	})
+	app.Get("profile/dados/client", func(c *fiber.Ctx) error {
+		a := c.Cookies("client")
+		login, _ := processlogin(a)
+		cli, err := db.GetClient(login.Id)
+		if err != nil {
+			c.Status(fiber.StatusBadRequest).SendString("ID invalido: " + err.Error())
+		}
+		return c.Render("clientdata", fiber.Map{
+			"client": cli,
+		})
+	})
+	app.Get("/profile", func(c *fiber.Ctx) error {
+		if c.Cookies("vendor") != "" {
+			return c.Redirect("/profile/vendor")
+		}
+		if c.Cookies("client") != "" {
+			return c.Redirect("/profile/client")
+		}
+		return c.Redirect("/login/client")
+
+	})
 	app.Get("/pedidos", func(c *fiber.Ctx) error {
 		cl := c.Cookies("client")
 		client, err := processlogin(cl)
@@ -270,8 +303,26 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 	},
 	)
+	app.Get("/confirm/:id", func(c *fiber.Ctx) error {
+		a := c.Cookies("vendor")
+		login, err := processlogin(a)
 
-	
+		if a == "" {
+			return c.Status(fiber.StatusBadRequest).SendString("Must be logged as a vendor")
+		}
+
+		id, err := c.ParamsInt("id")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Couldn't get params")
+		}
+		_, err = db.Db.Exec("UPDATE purchase SET payment_status = $1, vendor_id = $2 WHERE id = $3", "Compra completa", login.Id, id)
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString("Failed to update purchase: " + err.Error())
+		}
+
+		return c.SendString("Purchase " + string(id) + " succesfully confirmed")
+	})
 
 	app.Post("/signup/client", func(c *fiber.Ctx) error {
 		client := new(database.Client)
@@ -374,6 +425,10 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 	})
 	app.Post("/signup/vendor", func(c *fiber.Ctx) error {
+		a := c.Cookies("vendor")
+		if a == "" {
+			return c.Status(fiber.StatusBadRequest).SendString("Must be logged as a vendor")
+		}
 		client := new(database.Client)
 		if err := c.BodyParser(client); err != nil {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse form data")
@@ -398,23 +453,20 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 	)
 	app.Get("/logout", func(c *fiber.Ctx) error {
 
-		c.ClearCookie()
+		c.ClearCookie("client", "vendor")
 
 		return c.SendString("Todos os cookies foram deletados!")
 	})
-	/*
-		app.Get("/", func(c *fiber.Ctx) error {
-			return c.Render("index", fiber.Map{
-			})
-		})
-	*/
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{})
+	})
 
 	app.Get("/plants/all", func(c *fiber.Ctx) error {
 		plants, err := db.GetProducts()
 		if err != nil {
 			return err
 		}
-		return c.Render("view-plants",fiber.Map{
+		return c.Render("view-plants", fiber.Map{
 			"Title":  "Todas as plantas a venda",
 			"Plants": plants,
 		})
@@ -424,7 +476,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if err != nil {
 			return err
 		}
-		return c.Render("view-plants",fiber.Map{
+		return c.Render("view-plants", fiber.Map{
 			"Title":  "Todas as plantas a venda de mari (Imperdiveis)",
 			"Plants": plants,
 		})
@@ -439,7 +491,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.Render("view-plants",fiber.Map{
+		return c.Render("view-plants", fiber.Map{
 			"Title":  "Todas as plantas da categoria " + category,
 			"Plants": plants,
 		})
@@ -465,11 +517,31 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 				"error": err,
 			})
 		}
-		return c.Render("view-plants",fiber.Map{
+		return c.Render("view-plants", fiber.Map{
 			"Title":  "Todas as plantas de valor abaixo de " + max + " reais",
 			"Plants": plants,
 		})
 	})
+	app.Get("/plants/ending", func(c *fiber.Ctx) error {
+
+		a := c.Cookies("vendor")
+		if a == "" {
+			return c.Status(fiber.StatusBadRequest).SendString("Must be logged as a vendor")
+		}
+
+		plants, err := db.GetProductsByQuantity()
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err,
+			})
+		}
+		return c.Render("view-plants", fiber.Map{
+			"Title":  "Produtos próximos de acabar",
+			"Plants": plants,
+		})
+	})
+
 	// Rota que pega o nome diretamente no caminho
 	app.Get("/plant/name/:name", func(c *fiber.Ctx) error {
 		name := c.Params("name")
@@ -483,7 +555,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			return c.Status(fiber.StatusInternalServerError).SendString("Error fetching plant")
 		}
 
-		return c.Render("view-full-plant",fiber.Map{
+		return c.Render("view-full-plant", fiber.Map{
 			"Plant": plant,
 		})
 	})
