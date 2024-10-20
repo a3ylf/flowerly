@@ -107,7 +107,7 @@ CREATE OR REPLACE FUNCTION update_stock(
 ) RETURNS VOID AS $$
 BEGIN
     UPDATE plants
-    SET stock_quantity = p_stock_quantity
+    SET stock_quantity = stock_quantity + p_stock_quantity
     WHERE id = p_id;
 END;
 $$ LANGUAGE plpgsql;

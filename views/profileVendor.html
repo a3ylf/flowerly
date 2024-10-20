@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floricultura APM - Perfil</title>
+    <title>Floricultura APM - Perfil do Vendedor</title>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
@@ -83,28 +84,24 @@
             margin-bottom: 20px;
         }
 
-        .orders {
+        .products, .orders {
             margin-top: 20px;
         }
 
-        .order {
+        .product, .order {
             margin-bottom: 20px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 8px;
         }
 
-        .order h3 {
+        .product h3, .order h3 {
             margin-bottom: 10px;
         }
 
         .products {
             list-style: none;
             padding-left: 0;
-        }
-
-        .products li {
-            padding: 5px 0;
         }
 
         footer {
@@ -134,79 +131,90 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function () {
-        // Fetch para obter os pedidos
-        fetch('/pedidos')
-            .then(response => response.json())
-            .then(data => {
-                const ordersDiv = $('#orders');
+        $(document).ready(function () {
+            // Fetch para obter os produtos acabando
+            fetch('/plants/ending')
+                .then(response => response.json())
+                .then(data => {
+                    const productsDiv = $('#ending-products');
 
-                data.purchases.forEach(purchase => {
-                    let orderHTML;
-
-                    if (purchase.payment_method === "berries") {
-                        orderHTML = `
-                            <div class="order">
-                                <h3>Pedido #${purchase.purchase_id}</h3>
-                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
-                                <p>Total: ${purchase.total_amount} berries</p>
-                                <p>Status: ${purchase.payment_status}</p>
-                                <p>Método de Pagamento: ${purchase.payment_method}</p>
-                                <h4>Produtos:</h4>
-                                <ul class="products">
-                                    ${purchase.products.map(product => `
-                                        <li>${product.quantity}x ${product.product_name}</li>
-                                    `).join('')}
-                                </ul>
+                    data.forEach(product => {
+                        const productHTML = `
+                            <div class="product">
+                                <h3>${product.name}</h3>
+                                <p><strong>Nome Científico:</strong> ${product.scientific_name}</p>
+                                <p><strong>Descrição:</strong> ${product.description}</p>
+                                <p><strong>Preço:</strong> R$ ${product.price.toFixed(2)}</p>
+                                <p><strong>Quantidade em Estoque:</strong> ${product.stock_quantity}</p>
+                                <button class="update-stock" onclick="updateStock(${product.id}, ${product.stock_quantity})">Atualizar Estoque</button>
                             </div>
                         `;
-                    } else {
-                        orderHTML = `
-                            <div class="order">
-                                <h3>Pedido #${purchase.purchase_id}</h3>
-                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
-                                <p>Total: R$ ${(purchase.total_amount).toFixed(2)}</p>
-                                <p>Status: ${purchase.payment_status}</p>
-                                <p>Método de Pagamento: ${purchase.payment_method}</p>
-                                <h4>Produtos:</h4>
-                                <ul class="products">
-                                    ${purchase.products.map(product => `
-                                        <li>${product.quantity}x ${product.product_name}</li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
-
-                    ordersDiv.append(orderHTML);
+                        productsDiv.append(productHTML);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar produtos acabando:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar pedidos:', error);
-            });
-    });
-</script>
 
+            // Fetch para obter os pedidos esperando confirmação
+            fetch('/pedidos/confirmacao')
+                .then(response => response.json())
+                .then(data => {
+                    const ordersDiv = $('#pending-orders');
+
+                    data.forEach(order => {
+                        const orderHTML = `
+                            <div class="order">
+                                <h3>Pedido #${order.purchase_id}</h3>
+                                <p>Data: ${new Date(order.purchase_date).toLocaleDateString()}</p>
+                                <p>Total: R$ ${(order.total_amount).toFixed(2)}</p>
+                                <p>Status: ${order.payment_status}</p>
+                                <p>Método de Pagamento: ${order.payment_method}</p>
+                            </div>
+                        `;
+                        ordersDiv.append(orderHTML);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar pedidos esperando confirmação:', error);
+                });
+        });
+
+        function updateStock(productId, currentStock) {
+            const quantityToAdd = prompt("Informe a quantidade a ser adicionada ao estoque:");
+            if (quantityToAdd !== null) {
+                let quantity = parseInt(quantityToAdd, 10);
+                if (!isNaN(quantity) && quantity > 0) {
+                    quantity += currentStock;
+                    window.location.href = `/update-stock/${productId}?quantity=${quantity}`;
+                } else {
+                    alert("Por favor, insira um número válido maior que zero.");
+                }
+            }
+        }
+    </script>
 </head>
 
 <body>
 
-    <h1>Floricultura APM - Perfil do Cliente</h1>
+    <h1>Floricultura APM - Perfil do Vendedor</h1>
 
     <nav>
         <ul>
             <li><a href="/">Início</a></li>
             <li><a href="/plants/all">Produtos</a></li>
-            <li class="dropC">
-                <a href="/profile/dados/client">dados</a>
-            </li>
-              <li><a href = "/logout">logout</a>
+            <li><a href="/profile/ending">Produtos Acabando</a></li>
+            <li><a href="/pending.html">Pedidos Esperando Confirmação</a></li>
+            <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
 
     <div class="profile">
-        <h2>Seus Pedidos</h2>
-        <div id="orders" class="orders"></div>
+        <h2>Produtos Acabando</h2>
+        <div id="ending-products" class="products"></div>
+
+        <h2>Pedidos Esperando Confirmação</h2>
+        <div id="pending-orders" class="orders"></div>
     </div>
 
     <footer>
@@ -216,3 +224,4 @@
 
 </body>
 </html>
+

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos Pendentes</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Inclua seu CSS aqui -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #F4F2D5 0%, #E0DED5 100%);
+            color: #563808;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%;
+        }
+
+        h1 {
+            font-weight: 500;
+            font-size: 2.8rem;
+            color: #563808;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        nav {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1200px;
+            background-color: #78D75B;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav ul li {
+            position: relative;
+            margin: 0 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        nav ul li:hover > a {
+            background-color: #F35BAF;
+            border-radius: 5px;
+        }
+
+        nav ul li ul {
+            display: none;
+            position: absolute;
+            background-color: white;
+            top: 150%;
+            left: 0;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            min-width: 180px;
+            z-index: 10;
+        }
+
+        nav ul li:hover ul,
+        nav ul li ul:hover {
+            display: block;
+        }
+
+        nav ul li ul li {
+            position: relative;
+        }
+
+        nav ul li ul li a {
+            color: #78D75B;
+            padding: 10px 20px;
+            display: block;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        nav ul li ul li a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .client {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .purchase {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 5px solid #78D75B;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #78D75B;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #5cb85c;
+        }
+
+        footer {
+            width: 100%;
+            margin-top: 50px;
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            padding: 20px 0;
+        }
+
+        footer p {
+            margin: 5px 0;
+            color: #563808;
+        }
+
+        footer a {
+            color: #78D75B;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Pedidos Pendentes</h1>
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+          <li><a href="/profile/vendor">Perfil</a></li>
+        <!-- Adicione outros links de navegação aqui -->
+    </ul>
+</nav>
+
+<div id="client-purchases"></div>
+
+<script>
+    $(document).ready(function () {
+    fetch('/purchases/pending')
+        .then(response => response.json())
+        .then(data => {
+            const purchasesDiv = $('#client-purchases');
+
+            data.client_purchases.forEach(client => {
+                const clientDiv = $('<div class="client"></div>');
+                const clientHeader = $(`<h2>Cliente ID: ${client.client_id}</h2>`);
+                clientDiv.append(clientHeader);
+
+                client.purchases.forEach(purchase => {
+                    let purchaseDiv; // Declare a variável fora do if
+
+                    // Verifique o método de pagamento
+                    if (purchase.payment_method === "berries") {
+                        purchaseDiv = $(`
+                            <div class="purchase">
+                                <h3>Pedido #${purchase.purchase_id}</h3>
+                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
+                                <p>Total: ${(purchase.total_amount)} ${purchase.payment_method}</p>
+                                <p>Status: ${purchase.payment_status}</p>
+                                <button onclick="window.location.href='/confirm/${purchase.purchase_id}'">Confirmar Pedido</button>
+                            </div>
+                        `);
+                    } else {
+                        purchaseDiv = $(`
+                            <div class="purchase">
+                                <h3>Pedido #${purchase.purchase_id}</h3>
+                                <p>Data: ${new Date(purchase.purchase_date).toLocaleDateString()}</p>
+                                <p>Total: R$ ${(purchase.total_amount).toFixed(2)} (${purchase.payment_method})</p>
+                                <p>Status: ${purchase.payment_status}</p>
+                                <button onclick="window.location.href='/confirm/${purchase.purchase_id}'">Confirmar Pedido</button>
+                            </div>
+                        `);
+                    }
+
+                    // Adicione purchaseDiv ao clientDiv
+                    clientDiv.append(purchaseDiv);
+                });
+
+                purchasesDiv.append(clientDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar pedidos:', error);
+        });
+});
+
+</script>
+
+<footer>
+    <p>&copy; 2024 Sua Empresa. Todos os direitos reservados.</p>
+    <p><a href="/privacy-policy">Política de Privacidade</a></p>
+</footer>
+
+</body>
+</html>
+

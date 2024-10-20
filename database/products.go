@@ -206,3 +206,5 @@ func (db *Database) GetClientPurchases(clientID int) (*ClientPurchases, error) {
 
 	return &clientPurchases, nil
 }
+
+
