@@ -648,4 +648,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		})
 	})
 
+	
+	
 }
+
