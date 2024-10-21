@@ -1,4 +1,137 @@
-purchase${queryString}&payment=${paymentMethod}`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+        .questions, .modal {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+        .modal.active {
+            display: block;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Finalizar Compra</h1>
+
+    <!-- Janelas Modais -->
+    <div class="modal" id="modal1">
+        <p>Você é de Sousa?</p>
+        <button class="button" onclick="handleAnswer(true, 'modal1')">Sim</button>
+        <button class="button" onclick="handleAnswer(false, 'modal1')">Não</button>
+    </div>
+
+    <div class="modal" id="modal2">
+        <p>Você torce pro Flamengo?</p>
+        <button class="button" onclick="handleAnswer(true, 'modal2')">Sim</button>
+        <button class="button" onclick="handleAnswer(false, 'modal2')">Não</button>
+    </div>
+
+    <div class="modal" id="modal3">
+        <p>Você assiste One Piece?</p>
+        <button class="button" onclick="handleAnswer(true, 'modal3')">Sim</button>
+        <button class="button" onclick="handleAnswer(false, 'modal3')">Não</button>
+    </div>
+
+    <div class="overlay" id="overlay" style="display:none;"></div>
+
+    <div class="questions">
+        <p>Você gostaria de aplicar um desconto?</p>
+        <button class="button" onclick="openModal('modal1')">Sim</button>
+        <button class="button" onclick="redirectToPayment()">Não</button>
+    </div>
+
+    <script>
+        let discount = false;
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function handleAnswer(isYes, modalId) {
+            if (isYes) discount = true;
+            closeModal(modalId);
+
+            if (modalId === 'modal1') {
+                openModal('modal2');
+            } else if (modalId === 'modal2') {
+                openModal('modal3');
+            } else if (modalId === 'modal3') {
+                redirectToPayment();
+            }
+        }
+
+        function redirectToPayment() {
+            let paymentMethod = prompt("Digite o método de pagamento (crédito, pix, berries, dinheiro): ").toLowerCase();
+            let queryString = discount ? "?discount=true" : "";
+
+            if (paymentMethod === "crédito") {
+                let installments = prompt("Digite o número de parcelas (1 a 12): ");
+                alert("agencia 3928 conta 4921-9");
+                window.location.href = `/purchase${queryString}&payment=credit&installments=${installments}`;
+            } else if (paymentMethod === "pix") {
+                alert("Nossa chave pix: 12345678900");
+                window.location.href = `/purchase${queryString}&payment=pix`;
+            } else if (paymentMethod === "berries" || paymentMethod === "dinheiro") {
+                alert("Envie as berries para nossa secretária nami");
+                window.location.href = `/purchase${queryString}&payment=${paymentMethod}`;
             } else {
                 alert("Método de pagamento inválido.");
             }
