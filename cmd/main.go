@@ -458,7 +458,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		if c.Response().StatusCode() == 302 {
 			return c.Redirect("/purchase")
 		}
-		return c.Redirect("/profile")
+		return c.Redirect("/profile/client")
 
 	})
 	// routes.go
@@ -575,6 +575,9 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 	app.Get("/plants/category/", func(c *fiber.Ctx) error {
 		category := c.Query("category")
+    if category == "all"{
+      return c.Redirect("/plants/all")
+    }
 		plants, err := db.GetProductsByCategory(category)
 
 		if err != nil {
