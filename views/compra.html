@@ -120,18 +120,18 @@
 
         function redirectToPayment() {
             let paymentMethod = prompt("Digite o método de pagamento (crédito, pix, berries, dinheiro): ").toLowerCase();
-            let queryString = discount ? "?discount=true" : "";
+            let queryString = discount ? "?discount=true&payment=" : "?payment=";
 
             if (paymentMethod === "crédito") {
                 let installments = prompt("Digite o número de parcelas (1 a 12): ");
                 alert("agencia 3928 conta 4921-9");
-                window.location.href = `/purchase${queryString}&payment=credit&installments=${installments}`;
+                window.location.href = `/purchase${queryString}credit&installments=${installments}`;
             } else if (paymentMethod === "pix") {
                 alert("Nossa chave pix: 12345678900");
-                window.location.href = `/purchase${queryString}&payment=pix`;
+                window.location.href = `/purchase${queryString}=pix`;
             } else if (paymentMethod === "berries" || paymentMethod === "dinheiro") {
                 alert("Envie as berries para nossa secretária nami");
-                window.location.href = `/purchase${queryString}&payment=${paymentMethod}`;
+                window.location.href = `/purchase${queryString}${paymentMethod}`;
             } else {
                 alert("Método de pagamento inválido.");
             }
