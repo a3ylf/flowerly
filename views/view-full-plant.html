@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -74,7 +74,6 @@
         }
         
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -95,8 +94,6 @@
         <button onclick="addToCart()">Adicionar ao Carrinho</button>
     </div>
 
-
-
     <script>
         function addToCart() {
             let quantityInput = document.getElementById("quantity");
@@ -111,23 +108,8 @@
                 alert("Planta adicionada ao carrinho!");
                 
                 let result = confirm("Deseja continuar comprando?");
-                if (result) {
-                    window.location.href = "/plants/all";
-                } else {
-                    let paymentMethod = prompt("Digite o método de pagamento (crédito, pix, berries, dinheiro): ").toLowerCase();
-
-                    if (paymentMethod === "crédito") {
-                        let installments = prompt("Digite o número de parcelas (1 a 12): ");
-                        window.location.href = `/purchase?payment=credit`;
-                    } else if (paymentMethod === "pix") {
-                        alert("Nossa chave pix: 12345678900");
-                        window.location.href = `/purchase?payment=pix`;
-
-                    } else if (paymentMethod === "berries" || paymentMethod === "dinheiro") {
-                        window.location.href = `/purchase?payment=${paymentMethod}`;
-                    } else {
-                        alert("Método de pagamento inválido.");
-                    }
+                if (!result) {
+                    window.location.href = "/compra.html";
                 }
             } else {
                 alert("Por favor, insira uma quantidade válida.");
@@ -136,3 +118,4 @@
     </script>
 </body>
 </html>
+

@@ -313,7 +313,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 			cookie.Expires = time.Now().Add(3 * time.Hour)
 			cookie.HTTPOnly = false
 			c.Cookie(cookie)
-			return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
+			return c.Redirect("/plants/all")
 		}
 		cart := new(cartcookie)
 		err = json.Unmarshal([]byte(cartcontent), cart)
@@ -346,7 +346,7 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		cookie.HTTPOnly = false
 		c.Cookie(cookie)
 
-		return c.Status(fiber.StatusOK).SendString("Succesfully created a new cart and added it to it")
+		return c.Redirect("/plants/all")
 
 	},
 	)
@@ -575,9 +575,9 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 
 	app.Get("/plants/category/", func(c *fiber.Ctx) error {
 		category := c.Query("category")
-    if category == "all"{
-      return c.Redirect("/plants/all")
-    }
+		if category == "all" {
+			return c.Redirect("/plants/all")
+		}
 		plants, err := db.GetProductsByCategory(category)
 
 		if err != nil {
@@ -651,7 +651,4 @@ func setupRoutes(app *fiber.App, db *database.Database) {
 		})
 	})
 
-	
-	
 }
-
